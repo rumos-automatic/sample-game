@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ペット育成シミュレーション - Digital Pet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="device-frame">
+            <div class="screen">
+                <!-- ステータスバー -->
+                <div class="status-bar">
+                    <div class="pet-name" id="pet-name">ペット</div>
+                    <div class="pet-age">
+                        <span id="age">0</span>日目
+                    </div>
+                </div>
+
+                <!-- メイン画面 -->
+                <div class="main-screen">
+                    <div class="environment" id="environment">
+                        <div class="pet-container">
+                            <div class="pet" id="pet">
+                                <span class="pet-sprite" id="pet-sprite">🥚</span>
+                                <div class="pet-emotion" id="pet-emotion"></div>
+                            </div>
+                            <div class="pet-shadow"></div>
+                        </div>
+                        <div class="effects-layer" id="effects"></div>
+                    </div>
+                </div>
+
+                <!-- ステータス表示 -->
+                <div class="stats-display">
+                    <div class="stat-bar">
+                        <span class="stat-icon">❤️</span>
+                        <div class="bar">
+                            <div class="bar-fill health" id="health-bar"></div>
+                        </div>
+                        <span class="stat-value" id="health-value">100</span>
+                    </div>
+                    <div class="stat-bar">
+                        <span class="stat-icon">🍔</span>
+                        <div class="bar">
+                            <div class="bar-fill hunger" id="hunger-bar"></div>
+                        </div>
+                        <span class="stat-value" id="hunger-value">100</span>
+                    </div>
+                    <div class="stat-bar">
+                        <span class="stat-icon">😊</span>
+                        <div class="bar">
+                            <div class="bar-fill happiness" id="happiness-bar"></div>
+                        </div>
+                        <span class="stat-value" id="happiness-value">100</span>
+                    </div>
+                    <div class="stat-bar">
+                        <span class="stat-icon">✨</span>
+                        <div class="bar">
+                            <div class="bar-fill cleanliness" id="cleanliness-bar"></div>
+                        </div>
+                        <span class="stat-value" id="cleanliness-value">100</span>
+                    </div>
+                    <div class="stat-bar">
+                        <span class="stat-icon">😴</span>
+                        <div class="bar">
+                            <div class="bar-fill energy" id="energy-bar"></div>
+                        </div>
+                        <span class="stat-value" id="energy-value">100</span>
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="action-buttons">
+                    <button class="action-btn" id="feed-btn">
+                        <span class="btn-icon">🍖</span>
+                        <span class="btn-label">ごはん</span>
+                    </button>
+                    <button class="action-btn" id="play-btn">
+                        <span class="btn-icon">⚽</span>
+                        <span class="btn-label">あそぶ</span>
+                    </button>
+                    <button class="action-btn" id="clean-btn">
+                        <span class="btn-icon">🧼</span>
+                        <span class="btn-label">そうじ</span>
+                    </button>
+                    <button class="action-btn" id="sleep-btn">
+                        <span class="btn-icon">🛏️</span>
+                        <span class="btn-label">ねる</span>
+                    </button>
+                    <button class="action-btn" id="medicine-btn">
+                        <span class="btn-icon">💊</span>
+                        <span class="btn-label">くすり</span>
+                    </button>
+                    <button class="action-btn" id="train-btn">
+                        <span class="btn-icon">📚</span>
+                        <span class="btn-label">しつけ</span>
+                    </button>
+                </div>
+
+                <!-- 追加メニュー -->
+                <div class="menu-tabs">
+                    <button class="menu-btn active" data-menu="status">ステータス</button>
+                    <button class="menu-btn" data-menu="items">アイテム</button>
+                    <button class="menu-btn" data-menu="shop">ショップ</button>
+                    <button class="menu-btn" data-menu="settings">設定</button>
+                </div>
+
+                <!-- メニューコンテンツ -->
+                <div class="menu-content" id="menu-content" style="display: none;">
+                    <!-- 動的に生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over-screen" id="game-over" style="display: none;">
+            <div class="game-over-content">
+                <h2 id="game-over-title">ペットが...</h2>
+                <p id="game-over-message"></p>
+                <div class="final-stats" id="final-stats"></div>
+                <button class="restart-btn" id="restart-btn">新しいペットを育てる</button>
+            </div>
+        </div>
+
+        <!-- 進化画面 -->
+        <div class="evolution-screen" id="evolution-screen" style="display: none;">
+            <div class="evolution-content">
+                <h2>🌟 進化！ 🌟</h2>
+                <div class="evolution-animation">
+                    <span class="old-form" id="old-form"></span>
+                    <span class="arrow">→</span>
+                    <span class="new-form" id="new-form"></span>
+                </div>
+                <p id="evolution-message"></p>
+                <button class="continue-btn" id="continue-evolution">続ける</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

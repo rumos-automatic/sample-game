@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ビジュアルノベル - Mystery School</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- ゲーム画面 -->
+        <div class="game-screen">
+            <!-- 背景レイヤー -->
+            <div class="background-layer" id="background">
+                <div class="background-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            </div>
+            
+            <!-- キャラクターレイヤー -->
+            <div class="character-layer">
+                <div class="character-slot left" id="char-left"></div>
+                <div class="character-slot center" id="char-center"></div>
+                <div class="character-slot right" id="char-right"></div>
+            </div>
+            
+            <!-- エフェクトレイヤー -->
+            <div class="effect-layer" id="effects"></div>
+            
+            <!-- テキストボックス -->
+            <div class="text-box" id="text-box">
+                <div class="speaker-name" id="speaker">???</div>
+                <div class="text-content" id="text-content"></div>
+                <div class="next-indicator" id="next-indicator">▼</div>
+            </div>
+            
+            <!-- 選択肢 -->
+            <div class="choices-container" id="choices" style="display: none;">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
+        
+        <!-- UIパネル -->
+        <div class="ui-panel">
+            <div class="ui-buttons">
+                <button class="ui-btn" id="btn-auto">🔄 オート</button>
+                <button class="ui-btn" id="btn-skip">⏩ スキップ</button>
+                <button class="ui-btn" id="btn-log">📜 ログ</button>
+                <button class="ui-btn" id="btn-save">💾 セーブ</button>
+                <button class="ui-btn" id="btn-load">📂 ロード</button>
+                <button class="ui-btn" id="btn-config">⚙️ 設定</button>
+            </div>
+        </div>
+        
+        <!-- ログウィンドウ -->
+        <div class="log-window" id="log-window" style="display: none;">
+            <div class="log-header">
+                <h3>📜 メッセージログ</h3>
+                <button class="close-btn" id="close-log">✕</button>
+            </div>
+            <div class="log-content" id="log-content">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
+        
+        <!-- セーブ/ロード画面 -->
+        <div class="save-load-screen" id="save-load-screen" style="display: none;">
+            <div class="save-load-header">
+                <h3 id="save-load-title">セーブ</h3>
+                <button class="close-btn" id="close-save-load">✕</button>
+            </div>
+            <div class="save-slots" id="save-slots">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
+        
+        <!-- 設定画面 -->
+        <div class="config-screen" id="config-screen" style="display: none;">
+            <div class="config-header">
+                <h3>⚙️ 設定</h3>
+                <button class="close-btn" id="close-config">✕</button>
+            </div>
+            <div class="config-content">
+                <div class="config-item">
+                    <label>テキスト速度</label>
+                    <input type="range" id="text-speed" min="1" max="100" value="50">
+                    <span id="text-speed-value">50</span>
+                </div>
+                <div class="config-item">
+                    <label>オート速度</label>
+                    <input type="range" id="auto-speed" min="1" max="10" value="3">
+                    <span id="auto-speed-value">3</span>秒
+                </div>
+                <div class="config-item">
+                    <label>マスターボリューム</label>
+                    <input type="range" id="master-volume" min="0" max="100" value="50">
+                    <span id="volume-value">50</span>%
+                </div>
+                <div class="config-item">
+                    <label>フルスクリーン</label>
+                    <button class="config-btn" id="fullscreen-btn">全画面表示</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- タイトル画面 -->
+        <div class="title-screen" id="title-screen">
+            <div class="title-content">
+                <h1 class="game-title">🏫 Mystery School</h1>
+                <div class="title-menu">
+                    <button class="title-btn" id="start-btn">はじめから</button>
+                    <button class="title-btn" id="continue-btn">つづきから</button>
+                    <button class="title-btn" id="gallery-btn">ギャラリー</button>
+                    <button class="title-btn" id="credits-btn">クレジット</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="scenario.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

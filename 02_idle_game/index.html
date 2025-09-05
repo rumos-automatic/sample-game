@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放置RPG - Idle Adventure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>⚔️ Idle Adventure ⚔️</h1>
+            <div class="resource-bar">
+                <div class="resource">
+                    <span class="icon">💰</span>
+                    <span id="gold">0</span>
+                </div>
+                <div class="resource">
+                    <span class="icon">💎</span>
+                    <span id="gems">0</span>
+                </div>
+                <div class="resource">
+                    <span class="icon">⭐</span>
+                    <span id="level">1</span>
+                </div>
+                <div class="resource">
+                    <span class="icon">📊</span>
+                    <span id="exp">0/100</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <div class="left-panel">
+                <div class="hero-section">
+                    <h2>🗡️ ヒーロー</h2>
+                    <div class="hero-display">
+                        <div class="hero-sprite" id="hero-sprite">🧙‍♂️</div>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <span>HP:</span>
+                                <div class="health-bar">
+                                    <div class="health-fill" id="hero-hp"></div>
+                                    <span class="health-text" id="hero-hp-text">100/100</span>
+                                </div>
+                            </div>
+                            <div class="stat">
+                                <span>攻撃力:</span>
+                                <span id="hero-attack">10</span>
+                            </div>
+                            <div class="stat">
+                                <span>防御力:</span>
+                                <span id="hero-defense">5</span>
+                            </div>
+                            <div class="stat">
+                                <span>速度:</span>
+                                <span id="hero-speed">1.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-section">
+                    <h2>🛡️ 装備</h2>
+                    <div class="equipment-grid">
+                        <div class="equipment-slot" data-slot="weapon">
+                            <span class="slot-icon">⚔️</span>
+                            <span class="slot-name">武器</span>
+                            <span class="slot-level" id="weapon-level">Lv.1</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="armor">
+                            <span class="slot-icon">🛡️</span>
+                            <span class="slot-name">防具</span>
+                            <span class="slot-level" id="armor-level">Lv.1</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="accessory">
+                            <span class="slot-icon">💍</span>
+                            <span class="slot-name">アクセサリ</span>
+                            <span class="slot-level" id="accessory-level">Lv.1</span>
+                        </div>
+                        <div class="equipment-slot" data-slot="boots">
+                            <span class="slot-icon">👢</span>
+                            <span class="slot-name">ブーツ</span>
+                            <span class="slot-level" id="boots-level">Lv.1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center-panel">
+                <div class="battle-area">
+                    <h2>⚔️ バトルフィールド</h2>
+                    <div class="stage-info">
+                        <span>ステージ: </span>
+                        <span id="current-stage">1-1</span>
+                    </div>
+                    <div class="battle-field">
+                        <div class="enemy-container">
+                            <div class="enemy" id="enemy">
+                                <span class="enemy-sprite" id="enemy-sprite">👹</span>
+                                <div class="enemy-info">
+                                    <span class="enemy-name" id="enemy-name">ゴブリン</span>
+                                    <div class="health-bar">
+                                        <div class="health-fill enemy-health" id="enemy-hp"></div>
+                                        <span class="health-text" id="enemy-hp-text">50/50</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="damage-numbers" id="damage-numbers"></div>
+                    </div>
+                    <div class="stage-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="stage-progress"></div>
+                            <span class="progress-text" id="stage-progress-text">0/10</span>
+                        </div>
+                    </div>
+                    <button class="boss-button" id="boss-button">🔥 ボス戦に挑む</button>
+                </div>
+
+                <div class="skills-section">
+                    <h2>💫 スキル</h2>
+                    <div class="skills-grid">
+                        <div class="skill" data-skill="powerStrike">
+                            <span class="skill-icon">💥</span>
+                            <span class="skill-name">パワーストライク</span>
+                            <span class="skill-cooldown" id="skill-1-cd"></span>
+                        </div>
+                        <div class="skill" data-skill="heal">
+                            <span class="skill-icon">💚</span>
+                            <span class="skill-name">回復</span>
+                            <span class="skill-cooldown" id="skill-2-cd"></span>
+                        </div>
+                        <div class="skill" data-skill="berserk">
+                            <span class="skill-icon">🔥</span>
+                            <span class="skill-name">バーサーク</span>
+                            <span class="skill-cooldown" id="skill-3-cd"></span>
+                        </div>
+                        <div class="skill" data-skill="goldRush">
+                            <span class="skill-icon">💰</span>
+                            <span class="skill-name">ゴールドラッシュ</span>
+                            <span class="skill-cooldown" id="skill-4-cd"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="upgrade-section">
+                    <h2>⬆️ アップグレード</h2>
+                    <div class="upgrade-tabs">
+                        <button class="tab-button active" data-tab="equipment">装備強化</button>
+                        <button class="tab-button" data-tab="skills">スキル強化</button>
+                        <button class="tab-button" data-tab="stats">ステータス</button>
+                    </div>
+                    <div class="upgrade-content" id="upgrade-content">
+                        <!-- 動的に生成 -->
+                    </div>
+                </div>
+
+                <div class="inventory-section">
+                    <h2>🎒 インベントリ</h2>
+                    <div class="inventory-grid" id="inventory">
+                        <!-- 動的に生成 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="game-footer">
+            <div class="settings">
+                <button id="save-button">💾 セーブ</button>
+                <button id="load-button">📂 ロード</button>
+                <button id="reset-button">🔄 リセット</button>
+                <button id="pause-button">⏸️ ポーズ</button>
+            </div>
+            <div class="game-speed">
+                <label>ゲーム速度: </label>
+                <select id="speed-select">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="5">5x</option>
+                </select>
+            </div>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

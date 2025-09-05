@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Platform Adventure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-icon">👤</span>
+                    <span id="lives">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🪙</span>
+                    <span id="coins">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📊</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⏰</span>
+                    <span id="time">300</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🌍</span>
+                    <span id="level">1-1</span>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="controls-info">
+            <h3>操作方法</h3>
+            <div class="control-list">
+                <div class="control-item">
+                    <kbd>←</kbd><kbd>→</kbd> 移動
+                </div>
+                <div class="control-item">
+                    <kbd>SPACE</kbd> ジャンプ
+                </div>
+                <div class="control-item">
+                    <kbd>Shift</kbd> ダッシュ
+                </div>
+                <div class="control-item">
+                    <kbd>P</kbd> ポーズ
+                </div>
+            </div>
+        </div>
+        
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over-screen" id="gameOver" style="display: none;">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">GAME OVER</h2>
+                <p id="gameOverMessage"></p>
+                <div class="final-score">
+                    <p>最終スコア: <span id="finalScore">0</span></p>
+                    <p>獲得コイン: <span id="finalCoins">0</span></p>
+                </div>
+                <button class="btn" id="retryBtn">もう一度</button>
+                <button class="btn" id="menuBtn">メニューへ</button>
+            </div>
+        </div>
+        
+        <!-- スタート画面 -->
+        <div class="start-screen" id="startScreen">
+            <div class="start-content">
+                <h1>🏃 Super Platform Adventure 🏃</h1>
+                <button class="btn primary" id="startBtn">ゲーム開始</button>
+                <div class="difficulty-select">
+                    <label>難易度:</label>
+                    <select id="difficulty">
+                        <option value="easy">イージー</option>
+                        <option value="normal" selected>ノーマル</option>
+                        <option value="hard">ハード</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

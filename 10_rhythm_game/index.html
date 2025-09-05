@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Master - リズムゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- タイトル画面 -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title-background">
+                <div class="pulse-effect"></div>
+                <div class="pulse-effect delay-1"></div>
+                <div class="pulse-effect delay-2"></div>
+            </div>
+            <div class="title-content">
+                <h1 class="game-title">RHYTHM MASTER</h1>
+                <p class="subtitle">Feel the Beat!</p>
+                <div class="title-menu">
+                    <button class="menu-btn glowing" id="playBtn">
+                        <span class="btn-icon">▶️</span>
+                        <span class="btn-text">PLAY</span>
+                    </button>
+                    <button class="menu-btn" id="freePlayBtn">
+                        <span class="btn-icon">🎵</span>
+                        <span class="btn-text">FREE PLAY</span>
+                    </button>
+                    <button class="menu-btn" id="optionsBtn">
+                        <span class="btn-icon">⚙️</span>
+                        <span class="btn-text">OPTIONS</span>
+                    </button>
+                    <button class="menu-btn" id="recordsBtn">
+                        <span class="btn-icon">🏆</span>
+                        <span class="btn-text">RECORDS</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 曲選択画面 -->
+        <div class="song-select-screen" id="songSelectScreen" style="display: none;">
+            <div class="select-header">
+                <button class="back-btn" id="selectBackBtn">← BACK</button>
+                <h2>SELECT SONG</h2>
+            </div>
+            
+            <div class="song-list-container">
+                <div class="song-list" id="songList">
+                    <!-- 曲リスト -->
+                    <div class="song-card" data-song="1">
+                        <div class="song-jacket">🎸</div>
+                        <div class="song-info">
+                            <h3 class="song-title">Electric Dreams</h3>
+                            <p class="song-artist">DJ Thunder</p>
+                            <div class="song-difficulty">
+                                <span class="diff-easy">EASY ★★</span>
+                                <span class="diff-normal">NORMAL ★★★★</span>
+                                <span class="diff-hard">HARD ★★★★★★</span>
+                            </div>
+                        </div>
+                        <div class="song-scores">
+                            <div class="high-score">
+                                <span class="score-label">HIGH SCORE</span>
+                                <span class="score-value" id="score1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="song-card" data-song="2">
+                        <div class="song-jacket">🎹</div>
+                        <div class="song-info">
+                            <h3 class="song-title">Piano Fantasia</h3>
+                            <p class="song-artist">Classical Master</p>
+                            <div class="song-difficulty">
+                                <span class="diff-easy">EASY ★</span>
+                                <span class="diff-normal">NORMAL ★★★</span>
+                                <span class="diff-hard">HARD ★★★★★</span>
+                            </div>
+                        </div>
+                        <div class="song-scores">
+                            <div class="high-score">
+                                <span class="score-label">HIGH SCORE</span>
+                                <span class="score-value" id="score2">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="song-card" data-song="3">
+                        <div class="song-jacket">🥁</div>
+                        <div class="song-info">
+                            <h3 class="song-title">Drum & Bass Rush</h3>
+                            <p class="song-artist">Beat Maker</p>
+                            <div class="song-difficulty">
+                                <span class="diff-easy">EASY ★★★</span>
+                                <span class="diff-normal">NORMAL ★★★★★</span>
+                                <span class="diff-hard">HARD ★★★★★★★</span>
+                            </div>
+                        </div>
+                        <div class="song-scores">
+                            <div class="high-score">
+                                <span class="score-label">HIGH SCORE</span>
+                                <span class="score-value" id="score3">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="song-preview" id="songPreview">
+                    <h3>Song Preview</h3>
+                    <div class="preview-jacket">🎵</div>
+                    <div class="preview-info">
+                        <p class="preview-title">Select a song</p>
+                        <p class="preview-artist">-</p>
+                    </div>
+                    <div class="difficulty-selector">
+                        <h4>Select Difficulty</h4>
+                        <div class="diff-buttons">
+                            <button class="diff-btn active" data-diff="easy">EASY</button>
+                            <button class="diff-btn" data-diff="normal">NORMAL</button>
+                            <button class="diff-btn" data-diff="hard">HARD</button>
+                        </div>
+                    </div>
+                    <button class="start-btn" id="startSongBtn" disabled>START!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div class="game-screen" id="gameScreen" style="display: none;">
+            <!-- ゲームヘッダー -->
+            <div class="game-header">
+                <div class="score-display">
+                    <div class="score-label">SCORE</div>
+                    <div class="score-value" id="currentScore">0</div>
+                </div>
+                <div class="combo-display">
+                    <div class="combo-value" id="comboCount">0</div>
+                    <div class="combo-label">COMBO</div>
+                </div>
+                <div class="life-display">
+                    <div class="life-label">LIFE</div>
+                    <div class="life-bar">
+                        <div class="life-fill" id="lifeFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ゲームエリア -->
+            <div class="game-area">
+                <canvas id="gameCanvas"></canvas>
+                
+                <!-- 判定ライン -->
+                <div class="judgment-line">
+                    <div class="lane-target" data-lane="0">
+                        <div class="target-circle">D</div>
+                    </div>
+                    <div class="lane-target" data-lane="1">
+                        <div class="target-circle">F</div>
+                    </div>
+                    <div class="lane-target" data-lane="2">
+                        <div class="target-circle">J</div>
+                    </div>
+                    <div class="lane-target" data-lane="3">
+                        <div class="target-circle">K</div>
+                    </div>
+                </div>
+
+                <!-- 判定表示 -->
+                <div class="judgment-display" id="judgmentDisplay"></div>
+
+                <!-- エフェクトレイヤー -->
+                <div class="effect-layer" id="effectLayer"></div>
+            </div>
+
+            <!-- プログレスバー -->
+            <div class="song-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span> / <span id="totalTime">2:30</span>
+                </div>
+            </div>
+
+            <!-- コントロール -->
+            <div class="game-controls">
+                <button class="control-btn" id="pauseBtn">⏸️ PAUSE</button>
+                <button class="control-btn" id="retryBtn">🔄 RETRY</button>
+                <button class="control-btn" id="quitBtn">🚪 QUIT</button>
+            </div>
+        </div>
+
+        <!-- ポーズメニュー -->
+        <div class="pause-menu" id="pauseMenu" style="display: none;">
+            <div class="pause-content">
+                <h2>PAUSED</h2>
+                <div class="pause-options">
+                    <button class="pause-btn" id="resumeBtn">▶️ RESUME</button>
+                    <button class="pause-btn" id="pauseRetryBtn">🔄 RETRY</button>
+                    <button class="pause-btn" id="pauseQuitBtn">🚪 QUIT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- リザルト画面 -->
+        <div class="result-screen" id="resultScreen" style="display: none;">
+            <div class="result-content">
+                <h1 class="result-title">STAGE CLEAR!</h1>
+                
+                <div class="result-rank" id="resultRank">
+                    <span class="rank-letter">S</span>
+                </div>
+                
+                <div class="result-score">
+                    <div class="score-section">
+                        <h3>SCORE</h3>
+                        <p class="final-score" id="finalScore">0</p>
+                    </div>
+                    
+                    <div class="accuracy-section">
+                        <h3>ACCURACY</h3>
+                        <p class="accuracy-value" id="accuracyValue">100.00%</p>
+                    </div>
+                    
+                    <div class="combo-section">
+                        <h3>MAX COMBO</h3>
+                        <p class="max-combo" id="maxCombo">0</p>
+                    </div>
+                </div>
+                
+                <div class="judgment-breakdown">
+                    <div class="judgment-item perfect">
+                        <span class="judgment-label">PERFECT</span>
+                        <span class="judgment-count" id="perfectCount">0</span>
+                    </div>
+                    <div class="judgment-item great">
+                        <span class="judgment-label">GREAT</span>
+                        <span class="judgment-count" id="greatCount">0</span>
+                    </div>
+                    <div class="judgment-item good">
+                        <span class="judgment-label">GOOD</span>
+                        <span class="judgment-count" id="goodCount">0</span>
+                    </div>
+                    <div class="judgment-item miss">
+                        <span class="judgment-label">MISS</span>
+                        <span class="judgment-count" id="missCount">0</span>
+                    </div>
+                </div>
+                
+                <div class="new-record" id="newRecord" style="display: none;">
+                    <span class="record-text">NEW RECORD!</span>
+                </div>
+                
+                <div class="result-buttons">
+                    <button class="result-btn" id="resultRetryBtn">🔄 RETRY</button>
+                    <button class="result-btn" id="resultNextBtn">➡️ NEXT</button>
+                    <button class="result-btn" id="resultMenuBtn">🏠 MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- オプション画面 -->
+        <div class="options-screen" id="optionsScreen" style="display: none;">
+            <div class="options-content">
+                <h2>OPTIONS</h2>
+                
+                <div class="option-group">
+                    <label class="option-label">Note Speed</label>
+                    <input type="range" id="speedSlider" min="1" max="10" value="5" class="slider">
+                    <span class="slider-value" id="speedValue">5</span>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Sound Volume</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70" class="slider">
+                    <span class="slider-value" id="volumeValue">70%</span>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">SE Volume</label>
+                    <input type="range" id="seSlider" min="0" max="100" value="80" class="slider">
+                    <span class="slider-value" id="seValue">80%</span>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Timing Adjust</label>
+                    <input type="range" id="timingSlider" min="-50" max="50" value="0" class="slider">
+                    <span class="slider-value" id="timingValue">0ms</span>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Visual Effects</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="effectsToggle" checked>
+                        <label for="effectsToggle" class="toggle-label"></label>
+                    </div>
+                </div>
+                
+                <div class="option-buttons">
+                    <button class="option-btn" id="calibrateBtn">🎯 CALIBRATE</button>
+                    <button class="option-btn" id="resetOptionsBtn">🔄 RESET</button>
+                    <button class="option-btn" id="optionsBackBtn">← BACK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 記録画面 -->
+        <div class="records-screen" id="recordsScreen" style="display: none;">
+            <div class="records-content">
+                <h2>HIGH SCORES</h2>
+                
+                <div class="records-tabs">
+                    <button class="tab-btn active" data-tab="all">ALL</button>
+                    <button class="tab-btn" data-tab="song1">Electric Dreams</button>
+                    <button class="tab-btn" data-tab="song2">Piano Fantasia</button>
+                    <button class="tab-btn" data-tab="song3">Drum & Bass</button>
+                </div>
+                
+                <div class="records-list" id="recordsList">
+                    <!-- ハイスコアリスト -->
+                </div>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Plays</span>
+                        <span class="stat-value" id="totalPlays">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Perfect Rate</span>
+                        <span class="stat-value" id="perfectRate">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Average Score</span>
+                        <span class="stat-value" id="avgScore">0</span>
+                    </div>
+                </div>
+                
+                <button class="records-back-btn" id="recordsBackBtn">← BACK</button>
+            </div>
+        </div>
+
+        <!-- キャリブレーション画面 -->
+        <div class="calibration-screen" id="calibrationScreen" style="display: none;">
+            <div class="calibration-content">
+                <h2>TIMING CALIBRATION</h2>
+                <p>Press SPACE when the circle reaches the center</p>
+                
+                <div class="calibration-area">
+                    <div class="calibration-line"></div>
+                    <div class="calibration-circle" id="calibCircle"></div>
+                </div>
+                
+                <div class="calibration-info">
+                    <p>Attempt: <span id="calibAttempt">1</span> / 10</p>
+                    <p>Average Offset: <span id="calibOffset">0</span>ms</p>
+                </div>
+                
+                <button class="calib-btn" id="calibDoneBtn">DONE</button>
+            </div>
+        </div>
+
+        <!-- オーディオビジュアライザー -->
+        <div class="audio-visualizer" id="audioVisualizer">
+            <canvas id="visualizerCanvas"></canvas>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

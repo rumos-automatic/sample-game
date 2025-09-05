@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クッキークリッカー風ゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍪 Cookie Clicker</h1>
+            <div class="stats">
+                <div class="score">
+                    <span class="score-label">クッキー:</span>
+                    <span id="cookies">0</span>
+                </div>
+                <div class="cps">
+                    <span class="cps-label">秒間生産:</span>
+                    <span id="cps">0</span> /秒
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="cookie-section">
+                    <button id="cookie-btn" class="cookie-button">
+                        <span class="cookie-emoji">🍪</span>
+                    </button>
+                    <div class="click-effect" id="click-effect">+1</div>
+                </div>
+
+                <div class="shop-section">
+                    <h2>🏪 ショップ</h2>
+                    <div id="shop-items" class="shop-items">
+                        <!-- ショップアイテムは動的に生成 -->
+                    </div>
+                </div>
+
+                <div class="upgrades-section">
+                    <h2>⚡ アップグレード</h2>
+                    <div id="upgrades" class="upgrades">
+                        <!-- アップグレードは動的に生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievements-section">
+                <h2>🏆 実績</h2>
+                <div id="achievements" class="achievements">
+                    <!-- 実績は動的に生成 -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="save-btn">💾 セーブ</button>
+            <button id="reset-btn">🔄 リセット</button>
+            <span id="save-status"></span>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

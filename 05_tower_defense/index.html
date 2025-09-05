@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Defense - Fortress Guard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="header-left">
+                <div class="resource-display">
+                    <div class="resource-item">
+                        <span class="resource-icon">💰</span>
+                        <span class="resource-value" id="gold">500</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">❤️</span>
+                        <span class="resource-value" id="lives">20</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">🌊</span>
+                        <span class="resource-value" id="wave">1</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center">
+                <h2 class="stage-name" id="stageName">グラスランド防衛戦</h2>
+            </div>
+            <div class="header-right">
+                <div class="score-display">
+                    <span>スコア: </span>
+                    <span id="score">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="tower-panel">
+                <h3>タワー選択</h3>
+                <div class="tower-selection">
+                    <div class="tower-card" data-tower="arrow">
+                        <div class="tower-icon">🏹</div>
+                        <div class="tower-name">アローシューター</div>
+                        <div class="tower-cost">💰 100</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 10</span>
+                            <span>速度: 速い</span>
+                        </div>
+                    </div>
+                    <div class="tower-card" data-tower="cannon">
+                        <div class="tower-icon">💣</div>
+                        <div class="tower-name">キャノンタワー</div>
+                        <div class="tower-cost">💰 200</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 30</span>
+                            <span>速度: 遅い</span>
+                        </div>
+                    </div>
+                    <div class="tower-card" data-tower="magic">
+                        <div class="tower-icon">🔮</div>
+                        <div class="tower-name">マジックタワー</div>
+                        <div class="tower-cost">💰 300</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 20</span>
+                            <span>効果: 減速</span>
+                        </div>
+                    </div>
+                    <div class="tower-card" data-tower="ice">
+                        <div class="tower-icon">❄️</div>
+                        <div class="tower-name">フリーズタワー</div>
+                        <div class="tower-cost">💰 250</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 5</span>
+                            <span>効果: 凍結</span>
+                        </div>
+                    </div>
+                    <div class="tower-card" data-tower="laser">
+                        <div class="tower-icon">⚡</div>
+                        <div class="tower-name">レーザータワー</div>
+                        <div class="tower-cost">💰 500</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 50</span>
+                            <span>効果: 貫通</span>
+                        </div>
+                    </div>
+                    <div class="tower-card" data-tower="poison">
+                        <div class="tower-icon">☠️</div>
+                        <div class="tower-name">ポイズンタワー</div>
+                        <div class="tower-cost">💰 350</div>
+                        <div class="tower-stats">
+                            <span>攻撃: 15</span>
+                            <span>効果: 毒</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="selected-tower-info" id="selectedTowerInfo" style="display: none;">
+                    <h4>選択中のタワー</h4>
+                    <div class="tower-details" id="towerDetails"></div>
+                    <div class="tower-actions">
+                        <button class="action-btn upgrade-btn" id="upgradeBtn">
+                            <span>⬆️ アップグレード</span>
+                            <span class="cost" id="upgradeCost">💰 150</span>
+                        </button>
+                        <button class="action-btn sell-btn" id="sellBtn">
+                            <span>💸 売却</span>
+                            <span class="cost" id="sellValue">💰 75</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="control-btn" id="startWaveBtn">
+                <span>▶️ ウェーブ開始</span>
+            </button>
+            <button class="control-btn" id="speedBtn">
+                <span>⏩ 速度: 1x</span>
+            </button>
+            <button class="control-btn" id="pauseBtn">
+                <span>⏸️ ポーズ</span>
+            </button>
+            <button class="control-btn" id="resetBtn">
+                <span>🔄 リセット</span>
+            </button>
+        </div>
+
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over-screen" id="gameOverScreen" style="display: none;">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">GAME OVER</h2>
+                <div class="final-stats">
+                    <p>到達ウェーブ: <span id="finalWave">1</span></p>
+                    <p>倒した敵: <span id="enemiesKilled">0</span></p>
+                    <p>最終スコア: <span id="finalScore">0</span></p>
+                </div>
+                <button class="restart-btn" id="restartBtn">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <!-- ビクトリー画面 -->
+        <div class="victory-screen" id="victoryScreen" style="display: none;">
+            <div class="victory-content">
+                <h2>🎉 VICTORY! 🎉</h2>
+                <div class="victory-stats">
+                    <p>全ウェーブクリア！</p>
+                    <p>残りライフ: <span id="remainingLives">20</span></p>
+                    <p>最終スコア: <span id="victoryScore">0</span></p>
+                </div>
+                <button class="restart-btn" id="victoryRestartBtn">新しいゲーム</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle & Dragons RPG</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- タイトル画面 -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title-content">
+                <h1 class="game-title">PUZZLE & DRAGONS</h1>
+                <p class="subtitle">〜伝説のオーブマスター〜</p>
+                <button class="start-btn" id="startBtn">ゲーム開始</button>
+                <button class="continue-btn" id="continueBtn">続きから</button>
+                <div class="version">Version 1.0.0</div>
+            </div>
+        </div>
+
+        <!-- メインメニュー -->
+        <div class="main-menu" id="mainMenu" style="display: none;">
+            <div class="menu-header">
+                <div class="player-info">
+                    <div class="player-level">Lv.<span id="playerLevel">1</span></div>
+                    <div class="player-exp">
+                        <div class="exp-bar">
+                            <div class="exp-fill" id="expFill"></div>
+                        </div>
+                        <span class="exp-text" id="expText">0 / 100</span>
+                    </div>
+                    <div class="player-stamina">
+                        <span class="stamina-icon">⚡</span>
+                        <span id="stamina">50</span> / <span id="maxStamina">50</span>
+                    </div>
+                </div>
+                <div class="currency">
+                    <div class="gold">
+                        <span class="gold-icon">💰</span>
+                        <span id="gold">0</span>
+                    </div>
+                    <div class="gems">
+                        <span class="gem-icon">💎</span>
+                        <span id="gems">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-content">
+                <button class="menu-btn" id="dungeonBtn">
+                    <span class="btn-icon">🏰</span>
+                    <span class="btn-text">ダンジョン</span>
+                </button>
+                <button class="menu-btn" id="monsterBtn">
+                    <span class="btn-icon">🐲</span>
+                    <span class="btn-text">モンスター</span>
+                </button>
+                <button class="menu-btn" id="teamBtn">
+                    <span class="btn-icon">⚔️</span>
+                    <span class="btn-text">チーム編成</span>
+                </button>
+                <button class="menu-btn" id="evolveBtn">
+                    <span class="btn-icon">✨</span>
+                    <span class="btn-text">進化合成</span>
+                </button>
+                <button class="menu-btn" id="shopBtn">
+                    <span class="btn-icon">🛍️</span>
+                    <span class="btn-text">ショップ</span>
+                </button>
+                <button class="menu-btn" id="gachaBtn">
+                    <span class="btn-icon">🎰</span>
+                    <span class="btn-text">ガチャ</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ダンジョン選択 -->
+        <div class="dungeon-select" id="dungeonSelect" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="dungeonBackBtn">← 戻る</button>
+                <h2>ダンジョン選択</h2>
+            </div>
+            <div class="dungeon-list" id="dungeonList">
+                <!-- ダンジョンリストはJSで生成 -->
+            </div>
+        </div>
+
+        <!-- バトル画面 -->
+        <div class="battle-screen" id="battleScreen" style="display: none;">
+            <div class="battle-info">
+                <div class="turn-counter">
+                    ターン: <span id="turnCount">1</span>
+                </div>
+                <div class="combo-display" id="comboDisplay" style="display: none;">
+                    <span class="combo-count">0</span> COMBO!
+                </div>
+            </div>
+
+            <!-- 敵エリア -->
+            <div class="enemy-area">
+                <div class="enemies" id="enemies">
+                    <!-- 敵はJSで生成 -->
+                </div>
+            </div>
+
+            <!-- プレイヤーチーム -->
+            <div class="player-team">
+                <div class="team-hp">
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="teamHpFill"></div>
+                    </div>
+                    <span class="hp-text" id="teamHpText">5000 / 5000</span>
+                </div>
+                <div class="team-members" id="teamMembers">
+                    <!-- チームメンバーはJSで生成 -->
+                </div>
+            </div>
+
+            <!-- パズルボード -->
+            <div class="puzzle-board" id="puzzleBoard">
+                <canvas id="puzzleCanvas"></canvas>
+                <div class="move-timer" id="moveTimer" style="display: none;">
+                    <div class="timer-bar">
+                        <div class="timer-fill" id="timerFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- スキルボタン -->
+            <div class="skill-buttons" id="skillButtons">
+                <!-- スキルボタンはJSで生成 -->
+            </div>
+        </div>
+
+        <!-- モンスター一覧 -->
+        <div class="monster-list-screen" id="monsterListScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="monsterBackBtn">← 戻る</button>
+                <h2>モンスター図鑑</h2>
+                <div class="sort-options">
+                    <select id="sortSelect">
+                        <option value="id">番号順</option>
+                        <option value="level">レベル順</option>
+                        <option value="element">属性順</option>
+                        <option value="rarity">レア度順</option>
+                    </select>
+                </div>
+            </div>
+            <div class="monster-grid" id="monsterGrid">
+                <!-- モンスター一覧はJSで生成 -->
+            </div>
+        </div>
+
+        <!-- チーム編成画面 -->
+        <div class="team-edit-screen" id="teamEditScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="teamBackBtn">← 戻る</button>
+                <h2>チーム編成</h2>
+                <button class="save-btn" id="saveTeamBtn">保存</button>
+            </div>
+            
+            <div class="team-slots">
+                <h3>現在のチーム</h3>
+                <div class="current-team" id="currentTeam">
+                    <div class="team-slot leader" data-slot="0">
+                        <div class="slot-label">リーダー</div>
+                        <div class="slot-monster"></div>
+                    </div>
+                    <div class="team-slot" data-slot="1">
+                        <div class="slot-label">サブ1</div>
+                        <div class="slot-monster"></div>
+                    </div>
+                    <div class="team-slot" data-slot="2">
+                        <div class="slot-label">サブ2</div>
+                        <div class="slot-monster"></div>
+                    </div>
+                    <div class="team-slot" data-slot="3">
+                        <div class="slot-label">サブ3</div>
+                        <div class="slot-monster"></div>
+                    </div>
+                    <div class="team-slot" data-slot="4">
+                        <div class="slot-label">サブ4</div>
+                        <div class="slot-monster"></div>
+                    </div>
+                </div>
+                
+                <div class="team-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">総HP:</span>
+                        <span class="stat-value" id="totalHp">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">総攻撃力:</span>
+                        <span class="stat-value" id="totalAtk">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">総回復力:</span>
+                        <span class="stat-value" id="totalRcv">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="monster-selection">
+                <h3>モンスター選択</h3>
+                <div class="monster-list" id="teamMonsterList">
+                    <!-- モンスターリストはJSで生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 進化合成画面 -->
+        <div class="evolution-screen" id="evolutionScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="evolveBackBtn">← 戻る</button>
+                <h2>進化合成</h2>
+            </div>
+            
+            <div class="evolution-content">
+                <div class="base-monster">
+                    <h3>ベースモンスター</h3>
+                    <div class="evolution-slot" id="baseMonsterSlot">
+                        <div class="slot-empty">モンスターを選択</div>
+                    </div>
+                </div>
+                
+                <div class="evolution-arrow">→</div>
+                
+                <div class="evolved-monster">
+                    <h3>進化後</h3>
+                    <div class="evolution-slot" id="evolvedMonsterSlot">
+                        <div class="slot-empty">？？？</div>
+                    </div>
+                </div>
+                
+                <div class="evolution-materials">
+                    <h3>必要素材</h3>
+                    <div class="material-slots" id="materialSlots">
+                        <!-- 素材スロットはJSで生成 -->
+                    </div>
+                </div>
+                
+                <button class="evolve-execute-btn" id="evolveExecuteBtn" disabled>進化実行</button>
+            </div>
+            
+            <div class="evolvable-monsters">
+                <h3>進化可能モンスター</h3>
+                <div class="monster-list" id="evolvableList">
+                    <!-- 進化可能モンスターはJSで生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ショップ画面 -->
+        <div class="shop-screen" id="shopScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="shopBackBtn">← 戻る</button>
+                <h2>ショップ</h2>
+            </div>
+            
+            <div class="shop-tabs">
+                <button class="shop-tab active" data-tab="items">アイテム</button>
+                <button class="shop-tab" data-tab="stamina">スタミナ</button>
+                <button class="shop-tab" data-tab="special">特別</button>
+            </div>
+            
+            <div class="shop-content" id="shopContent">
+                <!-- ショップ内容はJSで生成 -->
+            </div>
+        </div>
+
+        <!-- ガチャ画面 -->
+        <div class="gacha-screen" id="gachaScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-btn" id="gachaBackBtn">← 戻る</button>
+                <h2>レアガチャ</h2>
+            </div>
+            
+            <div class="gacha-content">
+                <div class="gacha-banner">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Crect fill='%23FFD700' width='400' height='200'/%3E%3Ctext x='200' y='100' text-anchor='middle' font-size='24' fill='%23000'%3E超レア確率UP!%3C/text%3E%3C/svg%3E" alt="ガチャバナー">
+                </div>
+                
+                <div class="gacha-buttons">
+                    <button class="gacha-btn single-gacha" id="singleGachaBtn">
+                        <span class="gacha-icon">💎</span>
+                        <span class="gacha-cost">5</span>
+                        <span class="gacha-text">1回ガチャ</span>
+                    </button>
+                    <button class="gacha-btn multi-gacha" id="multiGachaBtn">
+                        <span class="gacha-icon">💎</span>
+                        <span class="gacha-cost">50</span>
+                        <span class="gacha-text">11連ガチャ</span>
+                    </button>
+                </div>
+                
+                <div class="gacha-rates">
+                    <h3>排出率</h3>
+                    <div class="rate-list">
+                        <div class="rate-item">
+                            <span class="rarity-star">★★★★★★</span>
+                            <span class="rate">3%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="rarity-star">★★★★★</span>
+                            <span class="rate">12%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="rarity-star">★★★★</span>
+                            <span class="rate">35%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="rarity-star">★★★</span>
+                            <span class="rate">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ガチャ結果 -->
+        <div class="gacha-result" id="gachaResult" style="display: none;">
+            <div class="result-content">
+                <h2>獲得モンスター！</h2>
+                <div class="result-monsters" id="resultMonsters">
+                    <!-- 結果はJSで生成 -->
+                </div>
+                <button class="ok-btn" id="gachaOkBtn">OK</button>
+            </div>
+        </div>
+
+        <!-- ダメージ表示用オーバーレイ -->
+        <div class="damage-overlay" id="damageOverlay"></div>
+
+        <!-- ステージクリア画面 -->
+        <div class="stage-clear" id="stageClear" style="display: none;">
+            <div class="clear-content">
+                <h1>STAGE CLEAR!</h1>
+                <div class="clear-rewards">
+                    <h3>獲得報酬</h3>
+                    <div class="reward-list" id="rewardList">
+                        <!-- 報酬はJSで生成 -->
+                    </div>
+                </div>
+                <div class="clear-stats">
+                    <div class="stat">最大コンボ: <span id="maxCombo">0</span></div>
+                    <div class="stat">クリアターン: <span id="clearTurns">0</span></div>
+                    <div class="stat">獲得経験値: <span id="gainedExp">0</span></div>
+                </div>
+                <button class="continue-btn" id="nextFloorBtn">次のフロアへ</button>
+                <button class="return-btn" id="returnMenuBtn">メニューに戻る</button>
+            </div>
+        </div>
+
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over" id="gameOver" style="display: none;">
+            <div class="game-over-content">
+                <h1>GAME OVER</h1>
+                <p>パーティーが全滅しました...</p>
+                <button class="retry-btn" id="retryBtn">リトライ (💎1)</button>
+                <button class="giveup-btn" id="giveupBtn">諦める</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

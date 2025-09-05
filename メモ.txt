@@ -1,0 +1,30 @@
+
+Claude Code サンプルゲーム
+
+
+01_clicker_game まだ
+02_idle_game まだ
+03_visual_novel OK
+04_pet_simulator まだ 勝手に進化する
+05_tower_defense OK
+06_puzzle_rpg まだ動作しない
+07_roguelike_dungeon OK
+08_mario_platformer 早すぎ
+09_rockman_action OK
+10_rhythm_game まだ
+ 
+難易度？
+
+01 ★☆☆
+02 ★★☆
+03 ★☆☆
+04 ★☆☆
+05 ★☆☆
+06 ★★☆
+07 ★☆☆
+08 ★☆☆
+09 ★☆☆
+10 ★★★
+
+サンプルゲーム1 （3.5.7.9）：保存期間100日
+https://75.gigafile.nu/1209-7a5377b4721e3a0168cbeaea31437678

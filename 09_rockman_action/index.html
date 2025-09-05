@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Action X</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- ステージセレクト画面 -->
+        <div class="stage-select-screen" id="stageSelectScreen">
+            <div class="stage-select-container">
+                <h1 class="game-title">MEGA ACTION X</h1>
+                <div class="stage-grid">
+                    <div class="stage-card" data-stage="fire">
+                        <div class="boss-icon">🔥</div>
+                        <div class="boss-name">FIRE MAN</div>
+                        <div class="stage-status" id="fire-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="ice">
+                        <div class="boss-icon">❄️</div>
+                        <div class="boss-name">ICE MAN</div>
+                        <div class="stage-status" id="ice-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="elec">
+                        <div class="boss-icon">⚡</div>
+                        <div class="boss-name">ELEC MAN</div>
+                        <div class="stage-status" id="elec-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="wind">
+                        <div class="boss-icon">🌪️</div>
+                        <div class="boss-name">WIND MAN</div>
+                        <div class="stage-status" id="wind-status"></div>
+                    </div>
+                    <div class="stage-card center-card" data-stage="start">
+                        <div class="boss-icon">🤖</div>
+                        <div class="boss-name">START</div>
+                    </div>
+                    <div class="stage-card" data-stage="metal">
+                        <div class="boss-icon">⚙️</div>
+                        <div class="boss-name">METAL MAN</div>
+                        <div class="stage-status" id="metal-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="wood">
+                        <div class="boss-icon">🌳</div>
+                        <div class="boss-name">WOOD MAN</div>
+                        <div class="stage-status" id="wood-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="bubble">
+                        <div class="boss-icon">💧</div>
+                        <div class="boss-name">BUBBLE MAN</div>
+                        <div class="stage-status" id="bubble-status"></div>
+                    </div>
+                    <div class="stage-card" data-stage="shadow">
+                        <div class="boss-icon">👤</div>
+                        <div class="boss-name">SHADOW MAN</div>
+                        <div class="stage-status" id="shadow-status"></div>
+                    </div>
+                </div>
+                <div class="weapon-inventory">
+                    <h3>取得武器</h3>
+                    <div class="weapon-list" id="weaponList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div class="game-container" id="gameContainer" style="display: none;">
+            <!-- HUD -->
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="health-bar">
+                        <span class="bar-label">P</span>
+                        <div class="bar-container">
+                            <div class="bar-fill player-health" id="playerHealthBar"></div>
+                        </div>
+                        <span class="bar-value" id="playerHealthValue">28</span>
+                    </div>
+                    <div class="weapon-energy-bar">
+                        <span class="bar-label">W</span>
+                        <div class="bar-container">
+                            <div class="bar-fill weapon-energy" id="weaponEnergyBar"></div>
+                        </div>
+                        <span class="bar-value" id="weaponEnergyValue">28</span>
+                    </div>
+                </div>
+                
+                <div class="hud-center">
+                    <div class="score-display">
+                        <span>SCORE: </span><span id="score">0</span>
+                    </div>
+                    <div class="lives-display">
+                        <span>LIVES: </span><span id="lives">3</span>
+                    </div>
+                </div>
+                
+                <div class="hud-right">
+                    <div class="boss-health-bar" id="bossHealthContainer" style="display: none;">
+                        <span class="bar-label">B</span>
+                        <div class="bar-container">
+                            <div class="bar-fill boss-health" id="bossHealthBar"></div>
+                        </div>
+                        <span class="bar-value" id="bossHealthValue">28</span>
+                    </div>
+                    <div class="weapon-select">
+                        <div class="current-weapon" id="currentWeapon">P</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- メインキャンバス -->
+            <canvas id="gameCanvas"></canvas>
+            
+            <!-- コントロール情報 -->
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h4>移動</h4>
+                    <div class="control-keys">
+                        <kbd>←</kbd><kbd>→</kbd> 左右移動
+                        <kbd>↑</kbd><kbd>↓</kbd> 梯子
+                    </div>
+                </div>
+                <div class="control-group">
+                    <h4>アクション</h4>
+                    <div class="control-keys">
+                        <kbd>Z</kbd> ジャンプ
+                        <kbd>X</kbd> ショット（長押しでチャージ）
+                        <kbd>C</kbd> スライディング
+                    </div>
+                </div>
+                <div class="control-group">
+                    <h4>武器</h4>
+                    <div class="control-keys">
+                        <kbd>A/S</kbd> 武器切替
+                        <kbd>P</kbd> ポーズ
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ポーズメニュー -->
+        <div class="pause-menu" id="pauseMenu" style="display: none;">
+            <div class="pause-content">
+                <h2>PAUSE</h2>
+                <div class="item-grid">
+                    <div class="item-slot" data-item="etank">
+                        <div class="item-icon">E</div>
+                        <div class="item-count" id="etank-count">0</div>
+                    </div>
+                    <div class="item-slot" data-item="wtank">
+                        <div class="item-icon">W</div>
+                        <div class="item-count" id="wtank-count">0</div>
+                    </div>
+                    <div class="item-slot" data-item="life">
+                        <div class="item-icon">1UP</div>
+                        <div class="item-count" id="life-count">3</div>
+                    </div>
+                </div>
+                <div class="pause-options">
+                    <button class="pause-btn" id="resumeBtn">再開</button>
+                    <button class="pause-btn" id="exitBtn">ステージ選択へ</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over-screen" id="gameOverScreen" style="display: none;">
+            <div class="game-over-content">
+                <h1 id="gameOverTitle">GAME OVER</h1>
+                <div class="game-over-stats">
+                    <p>スコア: <span id="finalScore">0</span></p>
+                    <p>撃破ボス: <span id="defeatedBosses">0</span></p>
+                </div>
+                <div class="game-over-options">
+                    <button class="game-btn" id="continueBtn">コンティニュー</button>
+                    <button class="game-btn" id="titleBtn">タイトルへ</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ステージクリア画面 -->
+        <div class="stage-clear-screen" id="stageClearScreen" style="display: none;">
+            <div class="stage-clear-content">
+                <h1>STAGE CLEAR!</h1>
+                <div class="weapon-get" id="weaponGet" style="display: none;">
+                    <h2>WEAPON GET!</h2>
+                    <div class="weapon-icon" id="newWeaponIcon"></div>
+                    <div class="weapon-name" id="newWeaponName"></div>
+                </div>
+                <div class="clear-bonus">
+                    <p>タイムボーナス: <span id="timeBonus">0</span></p>
+                    <p>ノーダメージボーナス: <span id="noDamageBonus">0</span></p>
+                    <p>合計スコア: <span id="totalScore">0</span></p>
+                </div>
+                <button class="game-btn" id="nextStageBtn">次へ</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

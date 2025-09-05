@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roguelike Dungeon - 深淵の迷宮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- タイトル画面 -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title-content">
+                <h1 class="game-title">深淵の迷宮</h1>
+                <p class="subtitle">〜 Roguelike Dungeon 〜</p>
+                <div class="title-menu">
+                    <button class="title-btn" id="newGameBtn">新しい冒険</button>
+                    <button class="title-btn" id="continueBtn">続きから</button>
+                    <button class="title-btn" id="recordsBtn">冒険の記録</button>
+                    <button class="title-btn" id="helpBtn">遊び方</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- キャラクター選択画面 -->
+        <div class="character-select" id="characterSelect" style="display: none;">
+            <h2>職業を選択</h2>
+            <div class="class-selection">
+                <div class="class-card" data-class="warrior">
+                    <div class="class-icon">⚔️</div>
+                    <h3>戦士</h3>
+                    <div class="class-stats">
+                        <p>HP: ★★★★★</p>
+                        <p>攻撃: ★★★★☆</p>
+                        <p>防御: ★★★★★</p>
+                        <p>魔力: ★☆☆☆☆</p>
+                        <p>速度: ★★☆☆☆</p>
+                    </div>
+                    <p class="class-description">高い体力と防御力を持つ近接戦闘のスペシャリスト</p>
+                </div>
+                <div class="class-card" data-class="mage">
+                    <div class="class-icon">🔮</div>
+                    <h3>魔法使い</h3>
+                    <div class="class-stats">
+                        <p>HP: ★★☆☆☆</p>
+                        <p>攻撃: ★★☆☆☆</p>
+                        <p>防御: ★☆☆☆☆</p>
+                        <p>魔力: ★★★★★</p>
+                        <p>速度: ★★★☆☆</p>
+                    </div>
+                    <p class="class-description">強力な魔法で敵を殲滅する遠距離アタッカー</p>
+                </div>
+                <div class="class-card" data-class="rogue">
+                    <div class="class-icon">🗡️</div>
+                    <h3>盗賊</h3>
+                    <div class="class-stats">
+                        <p>HP: ★★★☆☆</p>
+                        <p>攻撃: ★★★☆☆</p>
+                        <p>防御: ★★☆☆☆</p>
+                        <p>魔力: ★★☆☆☆</p>
+                        <p>速度: ★★★★★</p>
+                    </div>
+                    <p class="class-description">素早い動きとクリティカル攻撃が得意なアサシン</p>
+                </div>
+                <div class="class-card" data-class="priest">
+                    <div class="class-icon">✨</div>
+                    <h3>僧侶</h3>
+                    <div class="class-stats">
+                        <p>HP: ★★★★☆</p>
+                        <p>攻撃: ★★☆☆☆</p>
+                        <p>防御: ★★★☆☆</p>
+                        <p>魔力: ★★★★☆</p>
+                        <p>速度: ★★☆☆☆</p>
+                    </div>
+                    <p class="class-description">回復と支援魔法で仲間を守る聖職者</p>
+                </div>
+            </div>
+            <button class="back-btn" id="classBackBtn">戻る</button>
+        </div>
+
+        <!-- メインゲーム画面 -->
+        <div class="game-screen" id="gameScreen" style="display: none;">
+            <!-- ステータスバー -->
+            <div class="status-bar">
+                <div class="player-status">
+                    <div class="status-item">
+                        <span class="status-label">Lv</span>
+                        <span class="status-value" id="playerLevel">1</span>
+                    </div>
+                    <div class="status-item hp-status">
+                        <span class="status-label">HP</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="hpFill"></div>
+                            <span class="hp-text" id="hpText">100/100</span>
+                        </div>
+                    </div>
+                    <div class="status-item mp-status">
+                        <span class="status-label">MP</span>
+                        <div class="mp-bar">
+                            <div class="mp-fill" id="mpFill"></div>
+                            <span class="mp-text" id="mpText">50/50</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">EXP</span>
+                        <div class="exp-bar">
+                            <div class="exp-fill" id="expFill"></div>
+                            <span class="exp-text" id="expText">0/100</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="floor-info">
+                    <span class="floor-text">地下 <span id="floorNumber">1</span> 階</span>
+                </div>
+                <div class="turn-info">
+                    <span class="turn-text">ターン: <span id="turnNumber">0</span></span>
+                </div>
+            </div>
+
+            <!-- ゲームボード -->
+            <div class="game-board">
+                <canvas id="gameCanvas"></canvas>
+                <div class="minimap" id="minimap">
+                    <canvas id="minimapCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- インベントリ -->
+            <div class="inventory-panel">
+                <div class="equipment-section">
+                    <h3>装備</h3>
+                    <div class="equipment-slots">
+                        <div class="equip-slot" data-slot="weapon">
+                            <div class="slot-label">武器</div>
+                            <div class="slot-item" id="weaponSlot">-</div>
+                        </div>
+                        <div class="equip-slot" data-slot="armor">
+                            <div class="slot-label">防具</div>
+                            <div class="slot-item" id="armorSlot">-</div>
+                        </div>
+                        <div class="equip-slot" data-slot="accessory">
+                            <div class="slot-label">装飾品</div>
+                            <div class="slot-item" id="accessorySlot">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <h3>ステータス</h3>
+                    <div class="stat-list">
+                        <div class="stat-row">
+                            <span class="stat-name">攻撃力:</span>
+                            <span class="stat-value" id="atkStat">10</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">防御力:</span>
+                            <span class="stat-value" id="defStat">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">魔力:</span>
+                            <span class="stat-value" id="magStat">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">速度:</span>
+                            <span class="stat-value" id="spdStat">10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-section">
+                    <h3>持ち物</h3>
+                    <div class="inventory-grid" id="inventoryGrid">
+                        <!-- アイテムスロット -->
+                    </div>
+                </div>
+
+                <div class="skill-section">
+                    <h3>スキル</h3>
+                    <div class="skill-list" id="skillList">
+                        <!-- スキルリスト -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- メッセージログ -->
+            <div class="message-log" id="messageLog">
+                <div class="log-content" id="logContent"></div>
+            </div>
+
+            <!-- コントロール -->
+            <div class="game-controls">
+                <div class="movement-controls">
+                    <button class="move-btn" id="moveUpLeft">↖</button>
+                    <button class="move-btn" id="moveUp">↑</button>
+                    <button class="move-btn" id="moveUpRight">↗</button>
+                    <button class="move-btn" id="moveLeft">←</button>
+                    <button class="move-btn" id="moveWait">●</button>
+                    <button class="move-btn" id="moveRight">→</button>
+                    <button class="move-btn" id="moveDownLeft">↙</button>
+                    <button class="move-btn" id="moveDown">↓</button>
+                    <button class="move-btn" id="moveDownRight">↘</button>
+                </div>
+                <div class="action-controls">
+                    <button class="action-btn" id="attackBtn">攻撃</button>
+                    <button class="action-btn" id="skillBtn">スキル</button>
+                    <button class="action-btn" id="itemBtn">アイテム</button>
+                    <button class="action-btn" id="menuBtn">メニュー</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- アイテム詳細ポップアップ -->
+        <div class="item-popup" id="itemPopup" style="display: none;">
+            <div class="popup-content">
+                <h3 id="itemName">アイテム名</h3>
+                <div class="item-icon" id="itemIcon">?</div>
+                <p class="item-description" id="itemDescription">説明</p>
+                <div class="item-stats" id="itemStats"></div>
+                <div class="popup-actions">
+                    <button class="popup-btn" id="useItemBtn">使う</button>
+                    <button class="popup-btn" id="equipItemBtn">装備</button>
+                    <button class="popup-btn" id="dropItemBtn">捨てる</button>
+                    <button class="popup-btn" id="cancelItemBtn">キャンセル</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- スキル選択ポップアップ -->
+        <div class="skill-popup" id="skillPopup" style="display: none;">
+            <div class="popup-content">
+                <h3>スキル選択</h3>
+                <div class="skill-selection" id="skillSelection"></div>
+                <button class="popup-btn" id="cancelSkillBtn">キャンセル</button>
+            </div>
+        </div>
+
+        <!-- レベルアップ画面 -->
+        <div class="levelup-screen" id="levelupScreen" style="display: none;">
+            <div class="levelup-content">
+                <h2>LEVEL UP!</h2>
+                <div class="level-display">
+                    <span class="old-level" id="oldLevel">1</span>
+                    <span class="arrow">→</span>
+                    <span class="new-level" id="newLevel">2</span>
+                </div>
+                <div class="stat-increases">
+                    <div class="stat-increase">HP +<span id="hpIncrease">10</span></div>
+                    <div class="stat-increase">MP +<span id="mpIncrease">5</span></div>
+                    <div class="stat-increase">攻撃 +<span id="atkIncrease">2</span></div>
+                    <div class="stat-increase">防御 +<span id="defIncrease">1</span></div>
+                </div>
+                <div class="new-skill" id="newSkill" style="display: none;">
+                    <h3>新しいスキルを習得！</h3>
+                    <p id="newSkillName">スキル名</p>
+                </div>
+                <button class="continue-btn" id="levelupOkBtn">OK</button>
+            </div>
+        </div>
+
+        <!-- 階段発見画面 -->
+        <div class="stairs-screen" id="stairsScreen" style="display: none;">
+            <div class="stairs-content">
+                <h2>階段を発見！</h2>
+                <p>次の階へ進みますか？</p>
+                <div class="stairs-options">
+                    <button class="stairs-btn" id="goDownBtn">降りる</button>
+                    <button class="stairs-btn" id="stayBtn">まだ探索する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ゲームオーバー画面 -->
+        <div class="gameover-screen" id="gameoverScreen" style="display: none;">
+            <div class="gameover-content">
+                <h1>GAME OVER</h1>
+                <div class="final-stats">
+                    <p>到達階層: 地下 <span id="finalFloor">1</span> 階</p>
+                    <p>最終レベル: Lv.<span id="finalLevel">1</span></p>
+                    <p>倒した敵: <span id="enemiesDefeated">0</span> 体</p>
+                    <p>獲得アイテム: <span id="itemsCollected">0</span> 個</p>
+                    <p>生存ターン: <span id="survivalTurns">0</span></p>
+                </div>
+                <div class="death-message">
+                    <p id="deathCause">力尽きてしまった...</p>
+                </div>
+                <button class="restart-btn" id="restartBtn">タイトルに戻る</button>
+            </div>
+        </div>
+
+        <!-- クリア画面 -->
+        <div class="victory-screen" id="victoryScreen" style="display: none;">
+            <div class="victory-content">
+                <h1>🎉 VICTORY! 🎉</h1>
+                <p class="victory-message">深淵の迷宮を制覇した！</p>
+                <div class="victory-stats">
+                    <p>最終レベル: Lv.<span id="victoryLevel">1</span></p>
+                    <p>倒した敵: <span id="victoryEnemies">0</span> 体</p>
+                    <p>獲得アイテム: <span id="victoryItems">0</span> 個</p>
+                    <p>クリアターン: <span id="victoryTurns">0</span></p>
+                </div>
+                <button class="victory-btn" id="victoryBtn">タイトルに戻る</button>
+            </div>
+        </div>
+
+        <!-- ヘルプ画面 -->
+        <div class="help-screen" id="helpScreen" style="display: none;">
+            <div class="help-content">
+                <h2>遊び方</h2>
+                <div class="help-section">
+                    <h3>基本操作</h3>
+                    <ul>
+                        <li><strong>移動:</strong> 矢印キー or WASDキー or 画面のボタン</li>
+                        <li><strong>待機:</strong> スペースキー or ●ボタン</li>
+                        <li><strong>攻撃:</strong> 敵に隣接して移動</li>
+                        <li><strong>アイテム取得:</strong> アイテムの上を通過</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h3>マップの見方</h3>
+                    <ul>
+                        <li>🧙 - プレイヤー</li>
+                        <li>👾 - 敵</li>
+                        <li>📦 - 宝箱</li>
+                        <li>🔑 - 鍵</li>
+                        <li>🚪 - 扉</li>
+                        <li>⬇️ - 階段</li>
+                        <li>💊 - 回復薬</li>
+                        <li>⚔️ - 武器</li>
+                        <li>🛡️ - 防具</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h3>ヒント</h3>
+                    <ul>
+                        <li>敵との戦闘は慎重に。HPが0になると最初からやり直しです</li>
+                        <li>アイテムを上手く活用して深層を目指しましょう</li>
+                        <li>レベルアップで強くなり、新しいスキルを習得できます</li>
+                        <li>各職業には固有の特性があります</li>
+                    </ul>
+                </div>
+                <button class="help-close-btn" id="helpCloseBtn">閉じる</button>
+            </div>
+        </div>
+
+        <!-- 記録画面 -->
+        <div class="records-screen" id="recordsScreen" style="display: none;">
+            <div class="records-content">
+                <h2>冒険の記録</h2>
+                <div class="records-list" id="recordsList">
+                    <!-- 記録リスト -->
+                </div>
+                <button class="records-close-btn" id="recordsCloseBtn">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
