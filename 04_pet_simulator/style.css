@@ -16,28 +16,39 @@ body {
 
 .game-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 1400px;
+    min-width: 1000px;
 }
 
 .device-frame {
-    background: #2c3e50;
-    border-radius: 30px;
-    padding: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
 }
 
 .screen {
-    background: #ecf0f1;
-    border-radius: 20px;
-    overflow: hidden;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
     position: relative;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: 
+        "header header"
+        "main sidebar"
+        "footer footer";
+    min-height: 700px;
 }
 
 /* ステータスバー */
 .status-bar {
+    grid-area: header;
     background: linear-gradient(135deg, #3498db, #2980b9);
     color: white;
-    padding: 10px;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -54,9 +65,14 @@ body {
 
 /* メイン画面 */
 .main-screen {
-    height: 300px;
+    grid-area: main;
     position: relative;
     overflow: hidden;
+    min-height: 500px;
+    background: #f8f9fa;
+    margin: 20px;
+    border-radius: 15px;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .environment {
@@ -83,7 +99,7 @@ body {
 }
 
 .pet {
-    font-size: 100px;
+    font-size: 200px;
     animation: idle 2s ease-in-out infinite;
     position: relative;
 }
@@ -139,11 +155,11 @@ body {
 }
 
 .pet-shadow {
-    width: 80px;
-    height: 20px;
+    width: 160px;
+    height: 40px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
-    margin-top: -10px;
+    margin-top: -20px;
     animation: shadowPulse 2s ease-in-out infinite;
 }
 
@@ -179,11 +195,20 @@ body {
     }
 }
 
+/* サイドバー */
+.sidebar {
+    grid-area: sidebar;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e0e0;
+}
+
 /* ステータス表示 */
 .stats-display {
     background: white;
-    padding: 15px;
-    border-top: 2px solid #bdc3c7;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .stat-bar {
@@ -242,11 +267,11 @@ body {
 /* アクションボタン */
 .action-buttons {
     background: white;
-    padding: 15px;
+    padding: 20px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    border-top: 2px solid #bdc3c7;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .action-btn {
@@ -289,6 +314,7 @@ body {
 
 /* メニュータブ */
 .menu-tabs {
+    grid-area: footer;
     background: #34495e;
     display: flex;
     justify-content: space-around;
@@ -314,25 +340,87 @@ body {
     border-bottom: 3px solid #3498db;
 }
 
-/* メニューコンテンツ */
-.menu-content {
+/* メニューポップアップ */
+.menu-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.menu-popup-content {
     background: white;
-    padding: 20px;
-    min-height: 200px;
-    max-height: 300px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.menu-popup-close:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+.menu-popup-body {
+    padding: 30px;
+    max-height: calc(80vh - 60px);
     overflow-y: auto;
 }
 
 .status-details {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 .status-item {
-    background: #ecf0f1;
-    padding: 10px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    transition: all 0.3s;
+}
+
+.status-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: #3498db;
 }
 
 .status-label {
@@ -349,15 +437,16 @@ body {
 
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-top: 20px;
 }
 
 .inventory-item {
     aspect-ratio: 1;
-    background: #ecf0f1;
-    border: 2px solid #bdc3c7;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -365,12 +454,14 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .inventory-item:hover {
-    background: #3498db;
+    background: linear-gradient(135deg, #3498db, #2980b9);
     border-color: #2980b9;
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
 }
 
 .item-icon {
@@ -391,16 +482,27 @@ body {
 
 .shop-grid {
     display: grid;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
 }
 
 .shop-item {
-    background: #ecf0f1;
-    padding: 10px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.shop-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    border-color: #3498db;
 }
 
 .shop-item-info {
@@ -587,12 +689,236 @@ body {
 }
 
 /* レスポンシブ対応 */
-@media (max-width: 480px) {
-    .action-buttons {
+@media (max-width: 1200px) {
+    .game-container {
+        min-width: 800px;
+        max-width: 1000px;
+    }
+    
+    .screen {
+        grid-template-columns: 1fr 350px;
+    }
+    
+    .pet {
+        font-size: 150px;
+    }
+    
+    .main-screen {
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 900px) {
+    .screen {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+        grid-template-areas: 
+            "header"
+            "main"
+            "sidebar"
+            "footer";
+    }
+    
+    .menu-popup-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .status-details {
         grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
     }
     
     .inventory-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .shop-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .main-screen {
+        margin: 10px;
+        min-height: 300px;
+    }
+    
+    .pet {
+        font-size: 120px;
+    }
+    
+    .action-buttons {
         grid-template-columns: repeat(3, 1fr);
     }
+}
+
+/* アクション状態表示 */
+.action-status {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    text-align: center;
+    min-width: 250px;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.status-message.success {
+    color: #27ae60;
+    border-left: 4px solid #27ae60;
+    padding-left: 15px;
+}
+
+.status-message.warning {
+    color: #f39c12;
+    border-left: 4px solid #f39c12;
+    padding-left: 15px;
+}
+
+.status-message.error {
+    color: #e74c3c;
+    border-left: 4px solid #e74c3c;
+    padding-left: 15px;
+}
+
+.status-message.info {
+    color: #3498db;
+    border-left: 4px solid #3498db;
+    padding-left: 15px;
+}
+
+/* ミニゲーム画面 */
+.minigame-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.minigame-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 600px;
+    max-width: 90%;
+}
+
+.minigame-content h2 {
+    color: #f39c12;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.minigame-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.minigame-area {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 15px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.minigame-instructions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: white;
+}
+
+.minigame-instructions p {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.start-minigame-btn {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.start-minigame-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(39, 174, 96, 0.5);
+}
+
+.close-minigame-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.close-minigame-btn:hover {
+    transform: scale(1.05);
+}
+
+.coin-target {
+    position: absolute;
+    font-size: 40px;
+    cursor: pointer;
+    animation: bounce 2s ease-in-out infinite;
+    transition: all 0.2s;
+}
+
+.coin-target:hover {
+    transform: scale(1.2);
+}
+
+.coin-target.golden {
+    filter: drop-shadow(0 0 10px gold);
+    animation: bounce 1s ease-in-out infinite, glow 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }

@@ -5,6 +5,7 @@ class PetSimulator {
         this.age = 0;
         this.stage = 'egg'; // egg, baby, child, teen, adult
         this.species = null;
+        this.gameStartTime = Date.now(); // ゲーム開始時刻
         
         // ステータス
         this.stats = {
@@ -91,6 +92,18 @@ class PetSimulator {
             });
         });
         
+        // ポップアップ閉じるボタン
+        document.getElementById('menu-popup-close').addEventListener('click', () => {
+            document.getElementById('menu-popup-overlay').style.display = 'none';
+        });
+        
+        // オーバーレイクリックでも閉じる
+        document.getElementById('menu-popup-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'menu-popup-overlay') {
+                document.getElementById('menu-popup-overlay').style.display = 'none';
+            }
+        });
+        
         // リスタートボタン
         document.getElementById('restart-btn').addEventListener('click', () => this.restart());
         
@@ -108,6 +121,9 @@ class PetSimulator {
                 this.saveGame();
             }
         });
+        
+        // ミニゲーム初期化
+        this.initMinigame();
     }
     
     startGameLoop() {
@@ -157,10 +173,14 @@ class PetSimulator {
             this.showNotification('ペットが病気になりました！', 'warning');
         }
         
-        // 年齢の増加（10秒で1日）
-        if (Math.floor(Date.now() / 10000) > this.age) {
-            this.age = Math.floor(Date.now() / 10000);
-            this.coins += 10; // 日給
+        // 年齢の増加（60秒で1日）
+        const currentAge = Math.floor((Date.now() - this.gameStartTime) / 60000);
+        if (currentAge > this.age) {
+            const ageDifference = currentAge - this.age;
+            this.age = currentAge;
+            const dailyReward = 10 + Math.floor(this.stats.happiness / 10); // 幸福度ボーナス
+            this.coins += dailyReward * ageDifference; // 日給（複数日分）
+            this.showNotification(`日給獲得！ +💰${dailyReward * ageDifference}`, 'info');
         }
     }
     
@@ -220,70 +240,127 @@ class PetSimulator {
     }
     
     feed() {
-        if (this.isDead || this.isSleeping) return;
-        
-        if (this.inventory.food > 0) {
-            this.inventory.food--;
-            this.stats.hunger = Math.min(100, this.stats.hunger + 30);
-            this.stats.happiness = Math.min(100, this.stats.happiness + 10);
-            
-            this.showPetAnimation('eating');
-            this.showEffect('🍖');
-            this.showNotification('おいしい！', 'success');
-        } else {
-            this.showNotification('食べ物がありません！', 'error');
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
+            return;
         }
         
+        if (this.isSleeping) {
+            this.showNotification('ペットが寝ています（起こしてから餌をあげてください）', 'warning');
+            return;
+        }
+        
+        if (this.inventory.food <= 0) {
+            this.showNotification('食べ物がありません！（ショップで購入してください）', 'error');
+            return;
+        }
+        
+        if (this.stats.hunger >= 90) {
+            this.showNotification('お腹がいっぱいです', 'info');
+            return;
+        }
+        
+        // 餌をあげる処理
+        this.inventory.food--;
+        this.stats.hunger = Math.min(100, this.stats.hunger + 30);
+        this.stats.happiness = Math.min(100, this.stats.happiness + 10);
+        
+        this.showPetAnimation('eating');
+        this.showEffect('🍖');
+        
+        // アクション成功でコイン獲得
+        const reward = Math.floor(Math.random() * 5) + 3; // 3-7コイン
+        this.coins += reward;
+        this.showNotification(`おいしい！ +💰${reward}`, 'success');
         this.updateDisplay();
     }
     
     play() {
-        if (this.isDead || this.isSleeping || this.stats.energy < 20) {
-            if (this.stats.energy < 20) {
-                this.showNotification('疲れています...', 'warning');
-            }
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
             return;
         }
         
-        if (this.inventory.toy > 0) {
-            this.inventory.toy--;
-            this.stats.happiness = Math.min(100, this.stats.happiness + 40);
-            this.stats.energy = Math.max(0, this.stats.energy - 20);
-            this.stats.strength += 1;
-            
-            this.showPetAnimation('happy');
-            this.showEffect('⚽');
-            this.showNotification('楽しい！', 'success');
-        } else {
-            this.showNotification('おもちゃがありません！', 'error');
+        if (this.isSleeping) {
+            this.showNotification('ペットが寝ています（起こしてから遊んでください）', 'warning');
+            return;
         }
         
+        if (this.stats.energy < 20) {
+            this.showNotification('疲れすぎています（エネルギー20以上必要）', 'warning');
+            return;
+        }
+        
+        if (this.inventory.toy <= 0) {
+            this.showNotification('おもちゃがありません！（ショップで購入してください）', 'error');
+            return;
+        }
+        
+        if (this.stats.happiness >= 90) {
+            this.showNotification('もう十分楽しんでいます', 'info');
+            return;
+        }
+        
+        // 遊ぶ処理
+        this.inventory.toy--;
+        this.stats.happiness = Math.min(100, this.stats.happiness + 40);
+        this.stats.energy = Math.max(0, this.stats.energy - 20);
+        this.stats.strength += 1;
+        
+        this.showPetAnimation('happy');
+        this.showEffect('⚽');
+        
+        // アクション成功でコイン獲得
+        const reward = Math.floor(Math.random() * 8) + 5; // 5-12コイン
+        this.coins += reward;
+        this.showNotification(`楽しい！ +💰${reward}`, 'success');
         this.updateDisplay();
     }
     
     clean() {
-        if (this.isDead) return;
-        
-        if (this.inventory.soap > 0) {
-            this.inventory.soap--;
-            this.stats.cleanliness = 100;
-            this.stats.happiness = Math.min(100, this.stats.happiness + 15);
-            
-            this.showEffect('🫧');
-            this.showNotification('きれいになった！', 'success');
-        } else {
-            this.showNotification('せっけんがありません！', 'error');
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
+            return;
         }
         
+        if (this.inventory.soap <= 0) {
+            this.showNotification('せっけんがありません！（ショップで購入してください）', 'error');
+            return;
+        }
+        
+        if (this.stats.cleanliness >= 90) {
+            this.showNotification('もう十分きれいです', 'info');
+            return;
+        }
+        
+        // 掃除処理
+        this.inventory.soap--;
+        this.stats.cleanliness = 100;
+        this.stats.happiness = Math.min(100, this.stats.happiness + 15);
+        
+        this.showEffect('🫧');
+        
+        // アクション成功でコイン獲得
+        const reward = Math.floor(Math.random() * 5) + 2; // 2-6コイン
+        this.coins += reward;
+        this.showNotification(`きれいになった！ +💰${reward}`, 'success');
         this.updateDisplay();
     }
     
     sleep() {
-        if (this.isDead) return;
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
+            return;
+        }
         
         this.isSleeping = !this.isSleeping;
         
         if (this.isSleeping) {
+            if (this.stats.energy >= 80) {
+                this.showNotification('まだ眠くないようです（エネルギーが高すぎます）', 'info');
+                this.isSleeping = false;
+                return;
+            }
             document.getElementById('pet').classList.add('sleeping');
             document.getElementById('environment').classList.add('night');
             this.showEffect('💤');
@@ -298,39 +375,74 @@ class PetSimulator {
     }
     
     giveMedicine() {
-        if (this.isDead) return;
-        
-        if (this.inventory.medicine > 0) {
-            this.inventory.medicine--;
-            this.stats.health = Math.min(100, this.stats.health + 50);
-            this.isSick = false;
-            
-            document.getElementById('environment').classList.remove('sick');
-            this.showEffect('💊');
-            this.showNotification('元気になった！', 'success');
-        } else {
-            this.showNotification('薬がありません！', 'error');
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
+            return;
         }
         
+        if (this.isSleeping) {
+            this.showNotification('ペットが寝ています（起こしてから薬をあげてください）', 'warning');
+            return;
+        }
+        
+        if (this.inventory.medicine <= 0) {
+            this.showNotification('薬がありません！（ショップで購入してください）', 'error');
+            return;
+        }
+        
+        if (this.stats.health >= 90 && !this.isSick) {
+            this.showNotification('健康なので薬は必要ありません', 'info');
+            return;
+        }
+        
+        // 薬を与える処理
+        this.inventory.medicine--;
+        this.stats.health = Math.min(100, this.stats.health + 50);
+        this.isSick = false;
+        
+        document.getElementById('environment').classList.remove('sick');
+        this.showEffect('💊');
+        
+        // 病気を治したボーナス
+        const reward = 20;
+        this.coins += reward;
+        this.showNotification(`元気になった！ +💰${reward}`, 'success');
         this.updateDisplay();
     }
     
     train() {
-        if (this.isDead || this.isSleeping || this.stats.energy < 30) {
-            if (this.stats.energy < 30) {
-                this.showNotification('疲れています...', 'warning');
-            }
+        if (this.isDead) {
+            this.showNotification('ペットが死んでいます', 'error');
             return;
         }
         
+        if (this.isSleeping) {
+            this.showNotification('ペットが寝ています（起こしてからしつけをしてください）', 'warning');
+            return;
+        }
+        
+        if (this.stats.energy < 30) {
+            this.showNotification('疲れすぎています（エネルギー30以上必要）', 'warning');
+            return;
+        }
+        
+        if (this.stats.discipline >= 90 && this.stats.intelligence >= 50) {
+            this.showNotification('もう十分賢くなっています', 'info');
+            return;
+        }
+        
+        // しつけ処理
         this.stats.discipline = Math.min(100, this.stats.discipline + 10);
         this.stats.intelligence += 2;
         this.stats.energy = Math.max(0, this.stats.energy - 30);
         this.stats.happiness = Math.max(0, this.stats.happiness - 10);
         
         this.showEffect('📚');
-        this.showNotification('賢くなった！', 'success');
         
+        // しつけ成功でコイン獲得
+        const reward = Math.floor(Math.random() * 10) + 8; // 8-17コイン
+        this.coins += reward;
+        this.showNotification(`賢くなった！ +💰${reward}`, 'success');
         this.updateDisplay();
     }
     
@@ -359,6 +471,8 @@ class PetSimulator {
     
     showNotification(message, type) {
         const emotion = document.getElementById('pet-emotion');
+        const actionStatus = document.getElementById('action-status');
+        const statusMessage = document.getElementById('status-message');
         let emoji = '';
         
         switch(type) {
@@ -372,28 +486,46 @@ class PetSimulator {
         emotion.style.animation = 'none';
         void emotion.offsetWidth; // リフローを強制
         emotion.style.animation = 'fadeInOut 2s ease-in-out';
+        
+        // メッセージテキストも表示
+        if (statusMessage) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            actionStatus.style.display = 'block';
+            
+            // 3秒後に非表示
+            setTimeout(() => {
+                actionStatus.style.display = 'none';
+            }, 3000);
+        }
     }
     
     showMenu(menuType) {
-        const content = document.getElementById('menu-content');
-        content.style.display = 'block';
+        const overlay = document.getElementById('menu-popup-overlay');
+        const body = document.getElementById('menu-popup-body');
+        overlay.style.display = 'flex';
         
+        // タイトルを含むHTMLを生成
+        let content = '';
         switch(menuType) {
             case 'status':
-                content.innerHTML = this.getStatusHTML();
+                content = '<h2 style="color: #2c3e50; margin-bottom: 20px;">📊 ステータス詳細</h2>' + this.getStatusHTML();
                 break;
             case 'items':
-                content.innerHTML = this.getInventoryHTML();
+                content = '<h2 style="color: #2c3e50; margin-bottom: 20px;">🎒 インベントリ</h2>' + this.getInventoryHTML();
                 break;
             case 'shop':
-                content.innerHTML = this.getShopHTML();
+                content = '<h2 style="color: #2c3e50; margin-bottom: 20px;">🛍️ ショップ</h2>' + this.getShopHTML();
+                body.innerHTML = content;
                 this.setupShopListeners();
-                break;
+                return;
             case 'settings':
-                content.innerHTML = this.getSettingsHTML();
+                content = '<h2 style="color: #2c3e50; margin-bottom: 20px;">⚙️ 設定</h2>' + this.getSettingsHTML();
+                body.innerHTML = content;
                 this.setupSettingsListeners();
-                break;
+                return;
         }
+        body.innerHTML = content;
     }
     
     getStatusHTML() {
@@ -592,6 +724,7 @@ class PetSimulator {
             isSick: this.isSick,
             coins: this.coins,
             inventory: this.inventory,
+            gameStartTime: this.gameStartTime,
             timestamp: Date.now()
         };
         
@@ -612,6 +745,7 @@ class PetSimulator {
             this.isSick = data.isSick || false;
             this.coins = data.coins || 100;
             this.inventory = data.inventory || this.inventory;
+            this.gameStartTime = data.gameStartTime || Date.now();
             
             // オフライン報酬
             if (data.timestamp) {
@@ -626,6 +760,149 @@ class PetSimulator {
                 }
             }
         }
+    }
+    
+    // ミニゲーム機能
+    initMinigame() {
+        const minigameBtn = document.getElementById('minigame-btn');
+        const minigameScreen = document.getElementById('minigame-screen');
+        const startBtn = document.getElementById('start-minigame');
+        const closeBtn = document.getElementById('close-minigame');
+        const minigameArea = document.getElementById('minigame-area');
+        const timerDisplay = document.getElementById('minigame-timer');
+        const scoreDisplay = document.getElementById('minigame-score');
+        const instructions = document.getElementById('minigame-instructions');
+        
+        let gameActive = false;
+        let gameTimer = null;
+        let coinInterval = null;
+        let timeLeft = 30;
+        let score = 0;
+        
+        minigameBtn.addEventListener('click', () => {
+            if (this.isDead) {
+                this.showNotification('ペットが死んでいます', 'error');
+                return;
+            }
+            if (this.isSleeping) {
+                this.showNotification('ペットが寝ています', 'warning');
+                return;
+            }
+            minigameScreen.style.display = 'flex';
+        });
+        
+        closeBtn.addEventListener('click', () => {
+            if (gameActive) {
+                this.endMinigame(false);
+            }
+            minigameScreen.style.display = 'none';
+        });
+        
+        startBtn.addEventListener('click', () => {
+            this.startMinigame();
+        });
+        
+        this.startMinigame = () => {
+            gameActive = true;
+            timeLeft = 30;
+            score = 0;
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = timeLeft;
+            instructions.style.display = 'none';
+            
+            // タイマー開始
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    this.endMinigame(true);
+                }
+            }, 1000);
+            
+            // コイン生成
+            coinInterval = setInterval(() => {
+                if (gameActive) {
+                    this.spawnCoin();
+                }
+            }, 800);
+            
+            // 最初のコインを即座に生成
+            this.spawnCoin();
+        };
+        
+        this.spawnCoin = () => {
+            const coin = document.createElement('div');
+            coin.className = 'coin-target';
+            const isGolden = Math.random() < 0.15; // 15%の確率で金色
+            
+            if (isGolden) {
+                coin.classList.add('golden');
+                coin.textContent = '🌟';
+            } else {
+                coin.textContent = '💰';
+            }
+            
+            // ランダムな位置に配置
+            const maxX = minigameArea.offsetWidth - 50;
+            const maxY = minigameArea.offsetHeight - 50;
+            coin.style.left = Math.random() * maxX + 'px';
+            coin.style.top = Math.random() * maxY + 'px';
+            
+            // クリックイベント
+            coin.addEventListener('click', () => {
+                const points = isGolden ? 5 : 1;
+                score += points;
+                scoreDisplay.textContent = score;
+                
+                // エフェクト表示
+                const effect = document.createElement('div');
+                effect.textContent = `+${points}`;
+                effect.style.position = 'absolute';
+                effect.style.left = coin.style.left;
+                effect.style.top = coin.style.top;
+                effect.style.color = isGolden ? 'gold' : 'white';
+                effect.style.fontSize = '24px';
+                effect.style.fontWeight = 'bold';
+                effect.style.animation = 'floatUp 1s ease-out forwards';
+                effect.style.pointerEvents = 'none';
+                minigameArea.appendChild(effect);
+                
+                setTimeout(() => effect.remove(), 1000);
+                coin.remove();
+            });
+            
+            minigameArea.appendChild(coin);
+            
+            // 3秒後に自動削除
+            setTimeout(() => {
+                if (coin.parentNode) {
+                    coin.remove();
+                }
+            }, 3000);
+        };
+        
+        this.endMinigame = (complete) => {
+            gameActive = false;
+            clearInterval(gameTimer);
+            clearInterval(coinInterval);
+            
+            // 全てのコインを削除
+            const coins = minigameArea.querySelectorAll('.coin-target');
+            coins.forEach(coin => coin.remove());
+            
+            instructions.style.display = 'flex';
+            
+            if (complete && score > 0) {
+                this.coins += score;
+                this.showNotification(`ミニゲーム終了！ 💰${score}獲得！`, 'success');
+                this.updateDisplay();
+                
+                // ペットのステータスにも少し影響
+                this.stats.happiness = Math.min(100, this.stats.happiness + 10);
+                this.stats.energy = Math.max(0, this.stats.energy - 10);
+            }
+        };
     }
 }
 
