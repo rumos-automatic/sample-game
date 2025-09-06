@@ -31,34 +31,41 @@
                     <div class="click-effect" id="click-effect">+1</div>
                 </div>
 
-                <div class="shop-section">
-                    <h2>🏪 ショップ</h2>
-                    <div id="shop-items" class="shop-items">
-                        <!-- ショップアイテムは動的に生成 -->
+                <div class="content-section">
+                    <div class="main-tabs">
+                        <button class="main-tab-btn active" data-tab="shop">🏪 ショップ</button>
+                        <button class="main-tab-btn" data-tab="achievements">🏆 実績</button>
+                        <button class="main-tab-btn" data-tab="settings">⚙️ 設定</button>
+                    </div>
+                    
+                    <div class="tab-content" id="shop-content">
+                        <div class="shop-tabs">
+                            <button class="tab-btn active" data-tab="basic">🏠 基本</button>
+                            <button class="tab-btn" data-tab="industry">🏭 産業</button>
+                            <button class="tab-btn" data-tab="magic">✨ 魔法</button>
+                        </div>
+                        <div id="shop-items" class="shop-items">
+                            <!-- ショップアイテムは動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="achievements-content" style="display: none;">
+                        <div id="achievements" class="achievements">
+                            <!-- 実績は動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="settings-content" style="display: none;">
+                        <div class="settings-panel">
+                            <button id="save-btn" class="settings-btn">💾 セーブ</button>
+                            <button id="reset-btn" class="settings-btn danger">🔄 リセット</button>
+                            <div id="save-status"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="upgrades-section">
-                    <h2>⚡ アップグレード</h2>
-                    <div id="upgrades" class="upgrades">
-                        <!-- アップグレードは動的に生成 -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="achievements-section">
-                <h2>🏆 実績</h2>
-                <div id="achievements" class="achievements">
-                    <!-- 実績は動的に生成 -->
-                </div>
             </div>
         </main>
-
-        <footer>
-            <button id="save-btn">💾 セーブ</button>
-            <button id="reset-btn">🔄 リセット</button>
-            <span id="save-status"></span>
-        </footer>
     </div>
 
     <script src="game.js"></script>

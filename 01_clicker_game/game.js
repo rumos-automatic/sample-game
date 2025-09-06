@@ -9,27 +9,19 @@ class Game {
         
         // ショップアイテムの定義
         this.shopItems = [
-            { id: 'cursor', name: 'カーソル', emoji: '👆', baseCost: 15, cps: 0.1, owned: 0 },
-            { id: 'grandma', name: 'おばあちゃん', emoji: '👵', baseCost: 100, cps: 1, owned: 0 },
-            { id: 'farm', name: '農場', emoji: '🌾', baseCost: 1100, cps: 8, owned: 0 },
-            { id: 'mine', name: '鉱山', emoji: '⛏️', baseCost: 12000, cps: 47, owned: 0 },
-            { id: 'factory', name: '工場', emoji: '🏭', baseCost: 130000, cps: 260, owned: 0 },
-            { id: 'bank', name: '銀行', emoji: '🏦', baseCost: 1400000, cps: 1400, owned: 0 },
-            { id: 'temple', name: '寺院', emoji: '🛕', baseCost: 20000000, cps: 7800, owned: 0 },
-            { id: 'wizard', name: '魔法使い', emoji: '🧙', baseCost: 330000000, cps: 44000, owned: 0 },
-            { id: 'shipment', name: '宇宙船', emoji: '🚀', baseCost: 5100000000, cps: 260000, owned: 0 },
-            { id: 'alchemy', name: '錬金術', emoji: '⚗️', baseCost: 75000000000, cps: 1600000, owned: 0 }
+            { id: 'cursor', name: 'カーソル', emoji: '👆', baseCost: 15, baseCps: 1, cps: 1, clickPower: 1, owned: 0, level: 1, maxLevel: 5, category: 'basic' },
+            { id: 'grandma', name: 'おばあちゃん', emoji: '👵', baseCost: 100, baseCps: 5, cps: 5, clickPower: 2, owned: 0, level: 1, maxLevel: 5, category: 'basic' },
+            { id: 'farm', name: '農場', emoji: '🌾', baseCost: 500, baseCps: 20, cps: 20, clickPower: 5, owned: 0, level: 1, maxLevel: 5, category: 'basic' },
+            { id: 'mine', name: '鉱山', emoji: '⛏️', baseCost: 2000, baseCps: 100, cps: 100, clickPower: 10, owned: 0, level: 1, maxLevel: 5, category: 'industry' },
+            { id: 'factory', name: '工場', emoji: '🏭', baseCost: 10000, baseCps: 500, cps: 500, clickPower: 25, owned: 0, level: 1, maxLevel: 5, category: 'industry' },
+            { id: 'bank', name: '銀行', emoji: '🏦', baseCost: 50000, baseCps: 2000, cps: 2000, clickPower: 50, owned: 0, level: 1, maxLevel: 5, category: 'industry' },
+            { id: 'temple', name: '寺院', emoji: '🛕', baseCost: 200000, baseCps: 10000, cps: 10000, clickPower: 100, owned: 0, level: 1, maxLevel: 5, category: 'magic' },
+            { id: 'wizard', name: '魔法使い', emoji: '🧙', baseCost: 1000000, baseCps: 50000, cps: 50000, clickPower: 250, owned: 0, level: 1, maxLevel: 5, category: 'magic' },
+            { id: 'shipment', name: '宇宙船', emoji: '🚀', baseCost: 10000000, baseCps: 300000, cps: 300000, clickPower: 500, owned: 0, level: 1, maxLevel: 5, category: 'magic' },
+            { id: 'alchemy', name: '錬金術', emoji: '⚗️', baseCost: 100000000, baseCps: 2000000, cps: 2000000, clickPower: 1000, owned: 0, level: 1, maxLevel: 5, category: 'magic' }
         ];
         
-        // アップグレードの定義
-        this.upgrades = [
-            { id: 'doubleClick', name: 'ダブルクリック', desc: 'クリックの効果2倍', cost: 100, multiplier: 2, type: 'click', purchased: false },
-            { id: 'reinforcedCursor', name: '強化カーソル', desc: 'カーソルの効率2倍', cost: 500, multiplier: 2, type: 'cursor', purchased: false },
-            { id: 'goldenCookie', name: 'ゴールデンクッキー', desc: '全体生産力+10%', cost: 10000, multiplier: 1.1, type: 'global', purchased: false },
-            { id: 'sugarRush', name: 'シュガーラッシュ', desc: 'クリックの効果5倍', cost: 50000, multiplier: 5, type: 'click', purchased: false },
-            { id: 'cookieFactory', name: 'クッキー工場', desc: '工場の効率3倍', cost: 500000, multiplier: 3, type: 'factory', purchased: false },
-            { id: 'timeMachine', name: 'タイムマシン', desc: '全体生産力+20%', cost: 10000000, multiplier: 1.2, type: 'global', purchased: false }
-        ];
+        this.currentTab = 'basic';
         
         // 実績の定義
         this.achievements = [
@@ -53,6 +45,38 @@ class Game {
         document.getElementById('save-btn').addEventListener('click', () => this.saveGame());
         document.getElementById('reset-btn').addEventListener('click', () => this.resetGame());
         
+        // メインタブのイベントリスナー
+        document.querySelectorAll('.main-tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // すべてのタブコンテンツを非表示
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // 選択されたタブを表示
+                const tabName = btn.dataset.tab;
+                document.getElementById(`${tabName}-content`).style.display = 'flex';
+                
+                // 実績タブが選択された時は実績を更新
+                if (tabName === 'achievements') {
+                    this.updateAchievements();
+                }
+            });
+        });
+        
+        // ショップタブのイベントリスナー
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.currentTab = btn.dataset.tab;
+                this.updateShop();
+            });
+        });
+        
         // ゲームループの開始
         this.gameLoop();
         
@@ -60,8 +84,8 @@ class Game {
         setInterval(() => this.saveGame(true), 30000);
         
         // UIの初期化
+        this.calculateClickPower();
         this.updateShop();
-        this.updateUpgrades();
         this.updateAchievements();
         
         // セーブデータの読み込み
@@ -73,6 +97,8 @@ class Game {
         this.totalCookies += this.cookiesPerClick;
         this.totalClicks++;
         
+        console.log(`クリック: 総クリック=${this.totalClicks}, 総クッキー=${this.totalCookies}`);
+        
         // クリックエフェクトの表示
         this.showClickEffect(e);
         
@@ -83,14 +109,21 @@ class Game {
     
     showClickEffect(e) {
         const effect = document.getElementById('click-effect');
+        const button = document.getElementById('cookie-btn');
+        
         effect.textContent = `+${this.formatNumber(this.cookiesPerClick)}`;
         effect.classList.remove('show');
+        button.classList.remove('clicked');
+        
         void effect.offsetWidth; // リフローを強制
+        
         effect.classList.add('show');
+        button.classList.add('clicked');
         
         setTimeout(() => {
             effect.classList.remove('show');
-        }, 1000);
+            button.classList.remove('clicked');
+        }, 500);
     }
     
     buyShopItem(itemId) {
@@ -98,54 +131,49 @@ class Game {
         if (!item) return;
         
         const cost = this.getItemCost(item);
+        console.log(`購入試行: ${item.name}, コスト: ${cost}, 所持: ${this.cookies}, 購入可能: ${this.cookies >= cost}`);
+        
         if (this.cookies >= cost) {
             this.cookies -= cost;
             item.owned++;
             this.calculateCPS();
+            this.calculateClickPower();
+            this.updateDisplay();
+            this.updateShop();
+            this.checkAchievements();
+            console.log(`購入成功: ${item.name}, 残り: ${this.cookies}`);
+        } else {
+            console.log(`購入失敗: 資金不足`);
+        }
+    }
+    
+    upgradeShopItem(itemId) {
+        const item = this.shopItems.find(i => i.id === itemId);
+        if (!item || item.level >= item.maxLevel) return;
+        
+        const cost = this.getUpgradeCost(item);
+        if (this.cookies >= cost) {
+            this.cookies -= cost;
+            item.level++;
+            // レベルアップでCPSを2倍にする（整数のみ）
+            item.cps = item.baseCps * (1 << (item.level - 1)); // ビットシフトで2のべき乗
+            this.calculateCPS();
+            this.calculateClickPower();
             this.updateDisplay();
             this.updateShop();
             this.checkAchievements();
         }
     }
     
-    buyUpgrade(upgradeId) {
-        const upgrade = this.upgrades.find(u => u.id === upgradeId);
-        if (!upgrade || upgrade.purchased) return;
-        
-        if (this.cookies >= upgrade.cost) {
-            this.cookies -= upgrade.cost;
-            upgrade.purchased = true;
-            
-            // アップグレード効果の適用
-            this.applyUpgrade(upgrade);
-            
-            this.updateDisplay();
-            this.updateUpgrades();
-            this.checkAchievements();
-        }
-    }
-    
-    applyUpgrade(upgrade) {
-        switch (upgrade.type) {
-            case 'click':
-                this.cookiesPerClick *= upgrade.multiplier;
-                break;
-            case 'global':
-                this.calculateCPS();
-                break;
-            default:
-                // 特定アイテムの効率アップ
-                const item = this.shopItems.find(i => i.id === upgrade.type);
-                if (item) {
-                    item.cps *= upgrade.multiplier;
-                    this.calculateCPS();
-                }
-                break;
-        }
-    }
     
     getItemCost(item) {
-        return Math.floor(item.baseCost * Math.pow(1.15, item.owned));
+        // コスト上昇率を単純化: 1.15の代わりに所有数*15%を加算
+        return item.baseCost + Math.floor(item.baseCost * item.owned * 0.15);
+    }
+    
+    getUpgradeCost(item) {
+        // アップグレードコスト：基本コスト × 10 × レベル × レベル
+        return item.baseCost * 10 * item.level * item.level;
     }
     
     calculateCPS() {
@@ -154,89 +182,102 @@ class Game {
             cps += item.cps * item.owned;
         }
         
-        // グローバルアップグレードの適用
-        const globalUpgrades = this.upgrades.filter(u => u.type === 'global' && u.purchased);
-        for (const upgrade of globalUpgrades) {
-            cps *= upgrade.multiplier;
-        }
-        
         this.cookiesPerSecond = cps;
+    }
+    
+    calculateClickPower() {
+        let clickPower = 1;
+        for (const item of this.shopItems) {
+            if (item.clickPower) {
+                // レベルボーナス: レベル1=1倍, レベル2=2倍, レベル3=3倍...
+                clickPower += item.clickPower * item.owned * item.level;
+            }
+        }
+        this.cookiesPerClick = clickPower;
     }
     
     gameLoop() {
         setInterval(() => {
             if (this.cookiesPerSecond > 0) {
-                const production = this.cookiesPerSecond / 10; // 100ms = 0.1秒
-                this.cookies += production;
-                this.totalCookies += production;
+                // 1秒ごとに更新
+                this.cookies += this.cookiesPerSecond;
+                this.totalCookies += this.cookiesPerSecond;
                 this.updateDisplay();
                 this.checkAchievements();
             }
-        }, 100);
+        }, 1000);
     }
     
     updateDisplay() {
         document.getElementById('cookies').textContent = this.formatNumber(Math.floor(this.cookies));
-        document.getElementById('cps').textContent = this.formatNumber(this.cookiesPerSecond.toFixed(1));
+        document.getElementById('cps').textContent = this.formatNumber(this.cookiesPerSecond);
     }
     
     updateShop() {
         const shopContainer = document.getElementById('shop-items');
         shopContainer.innerHTML = '';
         
-        for (const item of this.shopItems) {
+        // 現在のタブでアイテムをフィルタリング
+        const filteredItems = this.shopItems.filter(item => item.category === this.currentTab);
+        
+        for (const item of filteredItems) {
             const cost = this.getItemCost(item);
+            const upgradeCost = this.getUpgradeCost(item);
             const canAfford = this.cookies >= cost;
+            const canUpgrade = this.cookies >= upgradeCost && item.level < item.maxLevel;
             
             const shopItemEl = document.createElement('div');
-            shopItemEl.className = `shop-item ${canAfford ? '' : 'disabled'}`;
+            shopItemEl.className = 'shop-item-container';
+            
+            // レベル表示用の星
+            const stars = '⭐'.repeat(item.level) + '☆'.repeat(item.maxLevel - item.level);
+            
             shopItemEl.innerHTML = `
-                <div class="item-info">
-                    <div class="item-name">${item.emoji} ${item.name}</div>
-                    <div class="item-cost">💰 ${this.formatNumber(cost)}</div>
-                    <div class="item-production">📈 +${this.formatNumber(item.cps)}/秒</div>
+                <div class="shop-item ${canAfford ? '' : 'disabled'}">
+                    <div class="item-info">
+                        <div class="item-name">${item.emoji} ${item.name} <span class="item-level">${stars}</span></div>
+                        <div class="item-cost">💰 コスト: ${this.formatNumber(cost)}</div>
+                        <div class="item-production">📈 生産: +${this.formatNumber(item.cps)}/秒</div>
+                        <div class="item-click-power">👆 クリック: +${this.formatNumber(item.clickPower * item.level)}</div>
+                    </div>
+                    <div class="item-owned">${item.owned}</div>
                 </div>
-                <div class="item-owned">${item.owned}</div>
+                ${item.level < item.maxLevel ? `
+                    <button class="upgrade-btn ${canUpgrade ? '' : 'disabled'}">
+                        <span class="upgrade-icon">⬆️</span>
+                        <span class="upgrade-text">レベル${item.level + 1}へ</span>
+                        <span class="upgrade-cost">💰 ${this.formatNumber(upgradeCost)}</span>
+                    </button>
+                ` : `
+                    <div class="max-level">MAX LEVEL!</div>
+                `}
             `;
             
-            if (canAfford) {
-                shopItemEl.addEventListener('click', () => this.buyShopItem(item.id));
+            const shopItem = shopItemEl.querySelector('.shop-item');
+            shopItem.addEventListener('click', () => this.buyShopItem(item.id));
+            
+            const upgradeBtn = shopItemEl.querySelector('.upgrade-btn');
+            if (upgradeBtn) {
+                upgradeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.upgradeShopItem(item.id);
+                });
             }
             
             shopContainer.appendChild(shopItemEl);
         }
     }
     
-    updateUpgrades() {
-        const upgradesContainer = document.getElementById('upgrades');
-        upgradesContainer.innerHTML = '';
-        
-        const availableUpgrades = this.upgrades.filter(u => !u.purchased);
-        
-        for (const upgrade of availableUpgrades) {
-            const canAfford = this.cookies >= upgrade.cost;
-            
-            const upgradeEl = document.createElement('div');
-            upgradeEl.className = `upgrade-item ${canAfford ? '' : 'disabled'}`;
-            upgradeEl.innerHTML = `
-                <div class="item-info">
-                    <div class="item-name">⚡ ${upgrade.name}</div>
-                    <div class="item-desc">${upgrade.desc}</div>
-                    <div class="item-cost">💰 ${this.formatNumber(upgrade.cost)}</div>
-                </div>
-            `;
-            
-            if (canAfford) {
-                upgradeEl.addEventListener('click', () => this.buyUpgrade(upgrade.id));
-            }
-            
-            upgradesContainer.appendChild(upgradeEl);
-        }
-    }
     
     updateAchievements() {
         const achievementsContainer = document.getElementById('achievements');
+        if (!achievementsContainer) {
+            console.warn('実績コンテナが見つかりません');
+            return;
+        }
+        
         achievementsContainer.innerHTML = '';
+        console.log('実績更新中:', this.achievements.map(a => ({name: a.name, unlocked: a.unlocked})));
         
         for (const achievement of this.achievements) {
             const achievementEl = document.createElement('div');
@@ -259,6 +300,7 @@ class Game {
                 achievement.unlocked = true;
                 newUnlock = true;
                 this.showAchievementNotification(achievement);
+                console.log(`✅ 実績解除: ${achievement.name}`);
             }
         }
         
@@ -273,12 +315,9 @@ class Game {
     }
     
     formatNumber(num) {
-        num = parseFloat(num);
-        if (num >= 1e12) return (num / 1e12).toFixed(2) + '兆';
-        if (num >= 1e8) return (num / 1e8).toFixed(2) + '億';
-        if (num >= 1e4) return (num / 1e4).toFixed(2) + '万';
-        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-        return Math.floor(num).toString();
+        num = Math.floor(parseFloat(num));
+        // すべてカンマ区切りで表示（動きが見える）
+        return num.toLocaleString('ja-JP');
     }
     
     saveGame(auto = false) {
@@ -289,7 +328,6 @@ class Game {
             totalCookies: this.totalCookies,
             totalClicks: this.totalClicks,
             shopItems: this.shopItems,
-            upgrades: this.upgrades,
             achievements: this.achievements,
             lastSave: Date.now()
         };
@@ -298,10 +336,12 @@ class Game {
         
         if (!auto) {
             const status = document.getElementById('save-status');
-            status.textContent = 'セーブ完了！';
-            status.classList.add('show');
+            status.textContent = '✅ セーブ完了！';
+            status.style.color = '#28a745';
+            status.style.fontSize = '1.2em';
+            status.style.fontWeight = 'bold';
             setTimeout(() => {
-                status.classList.remove('show');
+                status.textContent = '';
             }, 2000);
         }
     }
@@ -318,21 +358,35 @@ class Game {
             this.totalClicks = data.totalClicks || 0;
             
             if (data.shopItems) {
-                this.shopItems = data.shopItems;
+                // 古いセーブデータとの互換性を保つ
+                for (let i = 0; i < this.shopItems.length; i++) {
+                    if (data.shopItems[i]) {
+                        this.shopItems[i].owned = data.shopItems[i].owned || 0;
+                        this.shopItems[i].level = data.shopItems[i].level || 1;
+                        // CPSをレベルに応じて再計算（整数のみ）
+                        this.shopItems[i].cps = this.shopItems[i].baseCps * (1 << (this.shopItems[i].level - 1));
+                    }
+                }
             }
             
-            if (data.upgrades) {
-                this.upgrades = data.upgrades;
-            }
+            // クリック力を再計算
+            this.calculateClickPower();
             
             if (data.achievements) {
-                this.achievements = data.achievements;
+                // 実績のunlocked状態のみを復元（condition関数は保持）
+                for (let i = 0; i < this.achievements.length; i++) {
+                    if (data.achievements[i] && typeof data.achievements[i] === 'object') {
+                        // セーブデータから安全にunlocked状態のみを復元
+                        this.achievements[i].unlocked = Boolean(data.achievements[i].unlocked);
+                    }
+                }
+                console.log('実績データ復元完了:', this.achievements.map(a => ({name: a.name, unlocked: a.unlocked, hasCondition: typeof a.condition === 'function'})));
             }
             
             // オフライン時の生産を計算
             if (data.lastSave) {
-                const offlineTime = (Date.now() - data.lastSave) / 1000; // 秒単位
-                const offlineProduction = this.cookiesPerSecond * offlineTime * 0.1; // オフライン時は10%の効率
+                const offlineTime = Math.floor((Date.now() - data.lastSave) / 1000); // 秒単位
+                const offlineProduction = Math.floor(this.cookiesPerSecond * offlineTime / 10); // オフライン時は10%の効率
                 this.cookies += offlineProduction;
                 this.totalCookies += offlineProduction;
             }
@@ -340,7 +394,6 @@ class Game {
             this.calculateCPS();
             this.updateDisplay();
             this.updateShop();
-            this.updateUpgrades();
             this.updateAchievements();
         }
     }
