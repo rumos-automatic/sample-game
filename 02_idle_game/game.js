@@ -50,6 +50,15 @@ class IdleRPG {
         this.gameSpeed = 1;
         this.isPaused = false;
         this.autoSkills = true;
+        this.currentUpgradeTab = 'equipment';
+        
+        // ステータスアップグレードのコスト管理
+        this.statUpgradeCosts = {
+            maxHp: 500,
+            attack: 300,
+            defense: 250,
+            critChance: 1000
+        };
         
         // 敵の種類
         this.enemyTypes = [
@@ -71,6 +80,11 @@ class IdleRPG {
         this.startGameLoop();
         this.loadGame();
         this.updateDisplay();
+        
+        // 初期タブ表示（DOM読み込み完了後）
+        setTimeout(() => {
+            this.showUpgradeTab(this.currentUpgradeTab);
+        }, 100);
     }
     
     setupEventListeners() {
@@ -95,7 +109,8 @@ class IdleRPG {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                this.showUpgradeTab(tab.dataset.tab);
+                this.currentUpgradeTab = tab.dataset.tab;
+                this.showUpgradeTab(this.currentUpgradeTab);
             });
         });
         
@@ -114,9 +129,6 @@ class IdleRPG {
         document.getElementById('load-button').addEventListener('click', () => this.loadGame());
         document.getElementById('reset-button').addEventListener('click', () => this.resetGame());
         document.getElementById('pause-button').addEventListener('click', () => this.togglePause());
-        
-        // 初期タブ表示
-        this.showUpgradeTab('equipment');
     }
     
     startGameLoop() {
@@ -354,6 +366,11 @@ class IdleRPG {
             
             this.updateDisplay();
             this.updateEquipmentDisplay();
+            
+            // アップグレードタブが装備タブの場合、表示を更新
+            if (this.currentUpgradeTab === 'equipment') {
+                this.showUpgradeTab('equipment');
+            }
         }
     }
     
@@ -449,8 +466,11 @@ class IdleRPG {
                         if (this.gems >= cost / 100) {
                             this.gems -= cost / 100;
                             skill.level++;
-                            this.showUpgradeTab('skills');
                             this.updateDisplay();
+                            // スキルタブを再表示して最新情報を反映
+                            if (this.currentUpgradeTab === 'skills') {
+                                this.showUpgradeTab('skills');
+                            }
                         }
                     });
                     content.appendChild(item);
@@ -459,26 +479,30 @@ class IdleRPG {
             
             case 'stats':
                 const stats = [
-                    { name: 'HP強化', stat: 'maxHp', value: 50, cost: 500 },
-                    { name: '攻撃力強化', stat: 'attack', value: 5, cost: 300 },
-                    { name: '防御力強化', stat: 'defense', value: 3, cost: 250 },
-                    { name: 'クリティカル率', stat: 'critChance', value: 0.05, cost: 1000 }
+                    { name: 'HP強化', stat: 'maxHp', value: 50 },
+                    { name: '攻撃力強化', stat: 'attack', value: 5 },
+                    { name: '防御力強化', stat: 'defense', value: 3 },
+                    { name: 'クリティカル率', stat: 'critChance', value: 0.05 }
                 ];
                 
                 stats.forEach(stat => {
+                    const currentCost = this.statUpgradeCosts[stat.stat];
                     const item = document.createElement('div');
-                    item.className = `upgrade-item ${this.gold < stat.cost ? 'disabled' : ''}`;
+                    item.className = `upgrade-item ${this.gold < currentCost ? 'disabled' : ''}`;
                     item.innerHTML = `
                         <span class="upgrade-name">${stat.name} +${stat.value}</span>
-                        <span class="upgrade-cost">💰 ${this.formatNumber(stat.cost)}</span>
+                        <span class="upgrade-cost">💰 ${this.formatNumber(currentCost)}</span>
                     `;
                     item.addEventListener('click', () => {
-                        if (this.gold >= stat.cost) {
-                            this.gold -= stat.cost;
+                        if (this.gold >= currentCost) {
+                            this.gold -= currentCost;
                             this.hero[stat.stat] += stat.value;
-                            stat.cost = Math.floor(stat.cost * 1.3);
-                            this.showUpgradeTab('stats');
+                            this.statUpgradeCosts[stat.stat] = Math.floor(currentCost * 1.3);
                             this.updateDisplay();
+                            // ステータスタブを再表示して最新情報を反映
+                            if (this.currentUpgradeTab === 'stats') {
+                                this.showUpgradeTab('stats');
+                            }
                         }
                     });
                     content.appendChild(item);
@@ -644,6 +668,7 @@ class IdleRPG {
             currentWave: this.currentWave,
             enemiesDefeated: this.enemiesDefeated,
             inventory: this.inventory,
+            statUpgradeCosts: this.statUpgradeCosts,
             timestamp: Date.now()
         };
         
@@ -671,6 +696,7 @@ class IdleRPG {
             this.currentWave = data.currentWave || 1;
             this.enemiesDefeated = data.enemiesDefeated || 0;
             this.inventory = data.inventory || [];
+            this.statUpgradeCosts = data.statUpgradeCosts || this.statUpgradeCosts;
             
             // オフライン報酬の計算
             if (data.timestamp) {
